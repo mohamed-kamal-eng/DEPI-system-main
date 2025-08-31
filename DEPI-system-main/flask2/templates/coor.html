@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DEPI - Coordinator Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f0f7ff 0%, #ffffff 50%, #f8f0ff 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        /* Header Styles */
+        .header {
+            background: white;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #2563eb;
+            text-decoration: none;
+        }
+
+        .divider {
+            color: #9ca3af;
+        }
+
+        .breadcrumb {
+            color: #6b7280;
+        }
+
+        .user-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .welcome-text {
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+
+        .profile-btn {
+            background: #2563eb;
+            color: white;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .profile-btn:hover {
+            background: #1d4ed8;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+
+        /* Navigation Tabs */
+        .nav-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .tab-button {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.75rem;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            background: white;
+            color: #6b7280;
+        }
+
+        .tab-button.active {
+            background: #2563eb;
+            color: white;
+            box-shadow: 0 10px 25px rgba(37, 99, 235, 0.3);
+            transform: scale(1.05);
+        }
+
+        .tab-button:hover:not(.active) {
+            background: #eff6ff;
+            color: #2563eb;
+        }
+
+        /* Content Sections */
+        .content-section {
+            display: none;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        /* Profile Card */
+        .profile-card {
+            background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+            border-radius: 1.5rem;
+            padding: 2rem;
+            color: white;
+            box-shadow: 0 25px 50px rgba(37, 99, 235, 0.3);
+            transition: transform 0.3s ease;
+        }
+
+        .profile-card:hover {
+            transform: scale(1.02);
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .profile-avatar {
+            width: 5rem;
+            height: 5rem;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .profile-info h2 {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .profile-code {
+            color: #bfdbfe;
+        }
+
+        .profile-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .detail-item i {
+            color: #bfdbfe;
+            width: 18px;
+        }
+
+        .detail-label {
+            font-size: 0.875rem;
+            color: #bfdbfe;
+        }
+
+        .detail-value {
+            font-weight: 600;
+            margin-top: 0.25rem;
+        }
+
+        /* Section Headers */
+        .section-header {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        @media (min-width: 640px) {
+            .section-header {
+                flex-direction: row;
+                align-items: center;
+                justify-content: space-between;
+            }
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #1f2937;
+        }
+
+        .add-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: #2563eb;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.75rem;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 25px rgba(37, 99, 235, 0.2);
+        }
+
+        .add-btn:hover {
+            background: #1d4ed8;
+            box-shadow: 0 15px 35px rgba(37, 99, 235, 0.3);
+            transform: translateY(-2px);
+        }
+
+        /* Search and Filter */
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        @media (min-width: 640px) {
+            .controls {
+                flex-direction: row;
+            }
+        }
+
+        .search-wrapper {
+            position: relative;
+            flex: 1;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 0.75rem 1rem 0.75rem 3rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 0.75rem;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #2563eb;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+        }
+
+        .filter-wrapper {
+            position: relative;
+        }
+
+        .filter-select {
+            padding: 0.75rem 1rem 0.75rem 3rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 0.75rem;
+            background: white;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            min-width: 150px;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: #2563eb;
+        }
+
+        .filter-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+        }
+
+        /* Table Styles */
+        .table-container {
+            background: white;
+            border-radius: 1.5rem;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #f9fafb;
+            padding: 1rem 1.5rem;
+            text-align: left;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #374151;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        td {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #f3f4f6;
+            transition: all 0.2s ease;
+        }
+
+        tr:hover {
+            background: #eff6ff;
+        }
+
+        tr:nth-child(even) {
+            background: #f9fafb;
+        }
+
+        tr:nth-child(even):hover {
+            background: #eff6ff;
+        }
+
+        /* Attendance Rate */
+        .attendance-rate {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .status-dot {
+            width: 0.5rem;
+            height: 0.5rem;
+            border-radius: 50%;
+        }
+
+        .status-dot.high {
+            background: #10b981;
+        }
+
+        .status-dot.medium {
+            background: #f59e0b;
+        }
+
+        .status-dot.low {
+            background: #ef4444;
+        }
+
+        .status-icon {
+            width: 20px;
+            height: 20px;
+        }
+
+        .status-icon.good {
+            color: #10b981;
+        }
+
+        .status-icon.warning {
+            color: #ef4444;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .action-btn {
+            padding: 0.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .action-btn.view {
+            color: #2563eb;
+            background: #eff6ff;
+        }
+
+        .action-btn.view:hover {
+            background: #dbeafe;
+        }
+
+        .action-btn.edit {
+            color: #10b981;
+            background: #ecfdf5;
+        }
+
+        .action-btn.edit:hover {
+            background: #d1fae5;
+        }
+
+        /* Modal Styles */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 1.5rem;
+            padding: 2rem;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
+            animation: slideUp 0.3s ease-out;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #1f2937;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: #9ca3af;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        .close-btn:hover {
+            color: #6b7280;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #374151;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 0.75rem;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #2563eb;
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+        }
+
+        .save-btn {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            background: #2563eb;
+            color: white;
+            padding: 0.75rem;
+            border: none;
+            border-radius: 0.75rem;
+            font-weight: 500;
+            cursor: pointer;
+            margin-top: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .save-btn:hover {
+            background: #1d4ed8;
+            box-shadow: 0 10px 25px rgba(37, 99, 235, 0.2);
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(100px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .profile-header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .profile-details {
+                grid-template-columns: 1fr;
+            }
+
+            .nav-tabs {
+                flex-direction: column;
+            }
+
+            .tab-button {
+                justify-content: center;
+            }
+        }
+
+        /* Hidden class */
+        .hidden {
+            display: none;
+        }
+        .logout-section {
+            position: absolute;
+        }
+
+        .logout-button {
+           display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color : white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.75rem;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            background: white;
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo-section">
+                <a href="#" class="logo">DEPI</a>
+                <span class="divider">|</span>
+                <span class="breadcrumb">Coordinator Dashboard</span>
+            </div>
+            <div class="user-section">
+                <span class="welcome-text">Welcome back!</span>
+                <button class="profile-btn">Profile</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Navigation Tabs -->
+        <div class="nav-tabs">
+            <button class="tab-button active" data-tab="dashboard">
+                <i class="fas fa-user"></i>
+                Dashboard
+            </button>
+            <button class="tab-button" data-tab="attendance">
+                <i class="fas fa-calendar-alt"></i>
+                Attendance
+            </button>
+            <button class="tab-button" data-tab="feedback">
+                <i class="fas fa-comments"></i>
+                Feedback
+            </button>
+            <a href="{{url_for('home')}}"><div class="logout-section">
+                <button class="logout-button">
+                    <span class="nav-icon"></span>
+                    Logout
+                </button>
+            </div></a>
+        </div>
+
+        <!-- Dashboard Section -->
+        <div id="dashboard" class="content-section active">
+            <div class="profile-card">
+                <div class="profile-header">
+                    <div class="profile-avatar">
+                        <i class="fas fa-user fa-2x"></i>
+                    </div>
+                    <div class="profile-info">
+                        <h2>{{data[1]}}</h2>
+                        <p class="profile-code">#{{data[0]}}</p>
+                    </div>
+                </div>
+                
+                <div class="profile-details">
+                    <div class="detail-item">
+                        <i class="fas fa-bullseye"></i>
+                        <div>
+                            <div class="detail-label">Round</div>
+                            <div class="detail-value">Round 3</div>
+                        </div>
+                    </div>
+                    <div class="detail-item">
+                        <i class="fas fa-code"></i>
+                        <div>
+                            <div class="detail-label">Track</div>
+                            <div class="detail-value">{{data[2]}}</div>
+                        </div>
+                    </div>
+                    <div class="detail-item">
+                        <i class="fas fa-building"></i>
+                        <div>
+                            <div class="detail-label">Company</div>
+                            <div class="detail-value">{{data[3]}}</div>
+                        </div>
+                    </div>
+                    <div class="detail-item">
+                        <i class="fas fa-users"></i>
+                        <div>
+                            <div class="detail-label">Group</div>
+                            <div class="detail-value">{{data[4]}}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Attendance Section -->
+        <div id="attendance" class="content-section">
+            <div class="section-header">
+                <h3 class="section-title">Student Attendance</h3>
+                <button class="add-btn" onclick="openAttendanceModal()">
+                    <i class="fas fa-plus"></i>
+                    Set Attendance
+                </button>
+            </div>
+
+            <div class="controls">
+                <div class="search-wrapper">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" class="search-input" id="searchInput" placeholder="Search students...">
+                </div>
+                <div class="filter-wrapper">
+                    
+                    <select class="filter-select" id="groupFilter">
+                        
+                    </select>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Student Name</th>
+                                <th>Group</th>
+                                <th>Attendance Rate</th>
+                                
+                            </tr>
+                        </thead>
+                        <tbody id="attendanceTable">
+                            <!-- Table rows will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Feedback Section -->
+        <div id="feedback" class="content-section">
+            <h3 class="section-title">Student Feedback</h3>
+            
+            <div class="table-container">
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Student Name</th>
+                                <th>Feedback</th>
+                                <th>Instructor</th>
+                            </tr>
+                        </thead>
+                        <tbody id="feedbackTable">
+                            <!-- Table rows will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Attendance Modal -->
+     
+    <div id="attendanceModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Set Attendance</h4>
+                <button class="close-btn" onclick="closeAttendanceModal()">&times;</button>
+            </div>
+            
+            <form id="attendanceForm" action="{{ url_for('coord', id=data[0]) }}" method="POST">
+                <div class="form-group">
+                    <label class="form-label">Student ID</label>
+                    <input type="text" class="form-input" id="studentId" name ="stid" placeholder="Enter student ID" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Session ID</label>
+                    <input type="text" class="form-input" id="sessionId" name = "sesid" placeholder="Enter session ID" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Attendance Status</label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="attendance"  value="true" checked>
+                            <span>Present</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="attendance"  value="false">
+                            <span>Absent</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <button type="submit" class="save-btn">
+                    <i class="fas fa-save"></i>
+                    Save Attendance
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Sample data
+        const feedbackData = {{ feed_json | safe }};
+    const studentsData = {{ att_json | safe }};
+
+    console.log(feedbackData);
+    console.log(studentsData);
+
+        // Tab functionality
+        document.querySelectorAll('.tab-button').forEach(button => {
+            button.addEventListener('click', () => {
+                const tabId = button.getAttribute('data-tab');
+                
+                // Remove active class from all tabs and sections
+                document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+                document.querySelectorAll('.content-section').forEach(section => section.classList.remove('active'));
+                
+                // Add active class to clicked tab and corresponding section
+                button.classList.add('active');
+                document.getElementById(tabId).classList.add('active');
+            });
+        });
+
+        // Populate attendance table
+        function populateAttendanceTable(data = studentsData) {
+            const tableBody = document.getElementById('attendanceTable');
+            tableBody.innerHTML = '';
+
+            data.forEach(student => {
+                const row = document.createElement('tr');
+                
+                // Determine status dot color and icon
+                const statusDotClass = student.attendanceRate >= 90 ? 'high' : 
+                                     student.attendanceRate >= 80 ? 'medium' : 'low';
+                const statusIcon = student.attendanceRate >= 85 ? 
+                                  '<i class="fas fa-check-circle status-icon good"></i>' : 
+                                  '<i class="fas fa-times-circle status-icon warning"></i>';
+
+                row.innerHTML = `
+                    <td>${student.id}</td>
+                    <td><strong>${student.name}</strong></td>
+                    <td>${student.group}</td>
+                    <td>
+                        <div class="attendance-rate">
+                            <div class="status-dot ${statusDotClass}"></div>
+                            ${student.attendanceRate}%
+                        </div>
+                    </td>
+                   
+                `;
+
+                tableBody.appendChild(row);
+            });
+        }
+
+        // Populate feedback table
+        function populateFeedbackTable() {
+            const tableBody = document.getElementById('feedbackTable');
+            tableBody.innerHTML = '';
+
+            feedbackData.forEach(feedback => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><strong>${feedback.studentName}</strong></td>
+                    <td style="max-width: 300px;">
+                        <p style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${feedback.feedback}</p>
+                    </td>
+                    <td>${feedback.instructor}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="action-btn view" title="View Details">
+                                
+                            </button>
+                            <button class="action-btn edit" title="Edit Feedback">
+                               
+                            </button>
+                        </div>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        // Search functionality
+        document.getElementById('searchInput').addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            const groupFilter = document.getElementById('groupFilter').value;
+            filterStudents(searchTerm, groupFilter);
+        });
+
+        // Group filter functionality
+        document.getElementById('groupFilter').addEventListener('change', function() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const groupFilter = this.value;
+            filterStudents(searchTerm, groupFilter);
+        });
+
+        function filterStudents(searchTerm, groupFilter) {
+            const filteredData = studentsData.filter(student => {
+                const matchesSearch = student.name.toLowerCase().includes(searchTerm);
+                const matchesGroup = groupFilter === 'all' || student.group === groupFilter;
+                return matchesSearch && matchesGroup;
+            });
+
+            populateAttendanceTable(filteredData);
+        }
+
+        // Modal functionality
+        function openAttendanceModal() {
+            document.getElementById('attendanceModal').classList.add('active');
+        }
+
+        function closeAttendanceModal() {
+            document.getElementById('attendanceModal').classList.remove('active');
+            document.getElementById('attendanceForm').reset();
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('attendanceModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeAttendanceModal();
+            }
+        });
+
+        // Handle form submission
+       
+            
+            // Show success message (you can implement a toast notification)
+            
+        // Initialize tables when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            populateAttendanceTable();
+            populateFeedbackTable();
+        });
+    </script>
+</body>
+</html>

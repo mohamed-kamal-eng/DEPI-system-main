@@ -1,0 +1,1281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instructor Dashboard - DEPI Platform</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+        :root {
+            --primary: #4c63d2;
+            --primary-dark: #3b4fd6;
+            --primary-light: #667eea;
+            --accent: #625beb;
+            --background: #f8f9ff;
+            --background-alt: #e8f2ff;
+            --white: #ffffff;
+            --text-dark: #1a1a1a;
+            --text-gray: #555;
+            --glass: rgba(255, 255, 255, 0.1);
+            --shadow: 0 4px 15px rgba(76, 99, 210, 0.3);
+            --shadow-hover: 0 8px 25px rgba(76, 99, 210, 0.4);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--background) 0%, var(--background-alt) 100%);
+            min-height: 100vh;
+        }
+
+        /* Animated Background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(76, 99, 210, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(102, 126, 234, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(98, 91, 235, 0.05) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+            position: relative;
+            z-index: 1;
+        }
+
+        .sidebar {
+            width: 300px;
+            background: var(--white);
+            box-shadow: var(--shadow);
+            padding: 30px 20px;
+            position: relative;
+            overflow: hidden;
+            animation: slideInLeft 0.8s ease-out;
+            border-radius: 0 25px 25px 0;
+        }
+
+        @keyframes slideInLeft {
+            from {
+                transform: translateX(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .sidebar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent, rgba(76, 99, 210, 0.05), transparent);
+            animation: shimmer 4s infinite;
+            pointer-events: none;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .logo h2 {
+            color: var(--primary);
+            font-size: 32px;
+            font-weight: 800;
+            margin-bottom: 5px;
+            animation: glow 3s ease-in-out infinite alternate;
+        }
+
+        .logo p {
+            color: var(--text-gray);
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        @keyframes glow {
+            from { text-shadow: 0 0 10px rgba(76, 99, 210, 0.3); }
+            to { text-shadow: 0 0 20px rgba(76, 99, 210, 0.6); }
+        }
+
+        .nav-item {
+            display: block;
+            width: 100%;
+            padding: 18px 25px;
+            margin: 12px 0;
+            background: var(--white);
+            color: var(--text-gray);
+            border: 2px solid rgba(76, 99, 210, 0.1);
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            z-index: 2;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .nav-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(76, 99, 210, 0.1), transparent);
+            transition: left 0.6s;
+        }
+
+        .nav-item:hover::before {
+            left: 100%;
+        }
+
+        .nav-item:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow);
+            background: var(--white);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            color: var(--white);
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-hover);
+            border-color: var(--primary);
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 30px;
+            animation: fadeInUp 1s ease-out 0.3s both;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .page {
+            display: none;
+            background: var(--white);
+            border-radius: 25px;
+            padding: 40px;
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .page::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(76, 99, 210, 0.05) 0%, transparent 70%);
+            animation: rotate 30s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .page.active {
+            display: block;
+            animation: pageSlideIn 0.6s ease-out;
+        }
+
+        @keyframes pageSlideIn {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .page h1 {
+            color: var(--text-dark);
+            margin-bottom: 40px;
+            font-size: 36px;
+            font-weight: 700;
+            text-align: center;
+            position: relative;
+            z-index: 2;
+            animation: titleFloat 4s ease-in-out infinite;
+        }
+
+        @keyframes titleFloat {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-5px); }
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .info-card {
+            background: var(--white);
+            border: 2px solid rgba(76, 99, 210, 0.1);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            animation: cardFloat 6s ease-in-out infinite;
+            box-shadow: 0 4px 15px rgba(76, 99, 210, 0.1);
+        }
+
+        .info-card:nth-child(even) {
+            animation-delay: -3s;
+        }
+
+        @keyframes cardFloat {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+        }
+
+        .info-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent, rgba(76, 99, 210, 0.05), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.6s;
+        }
+
+        .info-card:hover::before {
+            transform: translateX(100%);
+        }
+
+        .info-card:hover {
+            transform: translateY(-12px);
+            box-shadow: var(--shadow-hover);
+            border-color: var(--primary);
+        }
+
+        .info-card .icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+            color: var(--primary);
+        }
+
+        .info-card h3 {
+            color: var(--text-gray);
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .info-card p {
+            color: var(--text-dark);
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .action-btn {
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            color: var(--white);
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 30px;
+            transition: all 0.4s ease;
+            position: relative;
+            z-index: 2;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .action-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            transition: all 0.6s ease;
+            transform: translate(-50%, -50%);
+        }
+
+        .action-btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-hover);
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+        }
+
+        .search-container {
+            margin-bottom: 30px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .search-input {
+            width: 100%;
+            max-width: 400px;
+            padding: 15px 25px;
+            background: var(--white);
+            border: 2px solid rgba(76, 99, 210, 0.2);
+            border-radius: 25px;
+            color: var(--text-dark);
+            font-size: 16px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(76, 99, 210, 0.1);
+        }
+
+        .search-input::placeholder {
+            color: var(--text-gray);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: var(--white);
+            box-shadow: var(--shadow);
+        }
+
+        .table-container {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 25px;
+            border: 2px solid rgba(76, 99, 210, 0.1);
+            position: relative;
+            z-index: 2;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(76, 99, 210, 0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            background: transparent;
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        th {
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            color: var(--white);
+            padding: 20px;
+            font-weight: 600;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: none;
+            position: relative;
+        }
+
+        th::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+        }
+
+        td {
+            padding: 18px 20px;
+            color: var(--text-dark);
+            border-bottom: 1px solid rgba(76, 99, 210, 0.1);
+            transition: all 0.3s ease;
+            background: var(--white);
+        }
+
+        tr {
+            transition: all 0.3s ease;
+            animation: rowSlideIn 0.6s ease-out both;
+        }
+
+        tr:nth-child(1) { animation-delay: 0.1s; }
+        tr:nth-child(2) { animation-delay: 0.2s; }
+        tr:nth-child(3) { animation-delay: 0.3s; }
+        tr:nth-child(4) { animation-delay: 0.4s; }
+        tr:nth-child(5) { animation-delay: 0.5s; }
+
+        @keyframes rowSlideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        tr:hover td {
+            background: rgba(76, 99, 210, 0.05);
+            transform: scale(1.01);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(26, 26, 26, 0.7);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: var(--white);
+            border: 2px solid rgba(76, 99, 210, 0.2);
+            border-radius: 25px;
+            padding: 40px;
+            width: 90%;
+            max-width: 500px;
+            animation: modalSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow-hover);
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .modal h2 {
+            color: var(--text-dark);
+            margin-bottom: 30px;
+            font-size: 28px;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+         /* Content Sections */
+        .content-section {
+            display: none;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        /* Profile Card */
+        .profile-card {
+            background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+            border-radius: 1.5rem;
+            padding: 2rem;
+            color: white;
+            box-shadow: 0 25px 50px rgba(37, 99, 235, 0.3);
+            transition: transform 0.3s ease;
+        }
+
+        .profile-card:hover {
+            transform: scale(1.02);
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .profile-avatar {
+            width: 5rem;
+            height: 5rem;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .profile-info h2 {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .profile-code {
+            color: #bfdbfe;
+        }
+
+        .profile-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .detail-item i {
+            color: #bfdbfe;
+            width: 18px;
+        }
+
+        .detail-label {
+            font-size: 0.875rem;
+            color: #bfdbfe;
+        }
+
+        .detail-value {
+            font-weight: 600;
+            margin-top: 0.25rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 10px;
+            color: var(--text-dark);
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 15px;
+            background: var(--white);
+            border: 2px solid rgba(76, 99, 210, 0.2);
+            border-radius: 12px;
+            color: var(--text-dark);
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input::placeholder,
+        .form-group textarea::placeholder {
+            color: var(--text-gray);
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(76, 99, 210, 0.1);
+        }
+
+        .form-group textarea {
+            height: 120px;
+            resize: vertical;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            color: var(--white);
+            box-shadow: var(--shadow);
+        }
+
+        .btn-secondary {
+            background: var(--white);
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .btn-secondary:hover {
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        .attendance-rate {
+            font-weight: 700;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            display: inline-block;
+        }
+
+        .attendance-high {
+            background: linear-gradient(135deg, #43e97b, #38f9d7);
+            color: var(--white);
+            animation: pulse 2s infinite;
+        }
+
+        .attendance-medium {
+            background: linear-gradient(135deg, #fa709a, #fee140);
+            color: var(--white);
+        }
+
+        .attendance-low {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            color: var(--white);
+            animation: warning-pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes warning-pulse {
+            0%, 100% { 
+                transform: scale(1); 
+                box-shadow: 0 0 0 rgba(240, 147, 251, 0.4); 
+            }
+            50% { 
+                transform: scale(1.05); 
+                box-shadow: 0 0 20px rgba(240, 147, 251, 0.6); 
+            }
+        }
+
+        /* Floating particles */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .particle {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: var(--primary);
+            border-radius: 50%;
+            opacity: 0.3;
+            animation: float 25s infinite linear;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) scale(0);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-10vh) scale(1);
+                opacity: 0;
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                border-radius: 0;
+                padding: 20px;
+            }
+
+            .main-content {
+                padding: 20px;
+            }
+
+            .page {
+                padding: 20px;
+            }
+
+            .hero-title {
+                font-size: 24px;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .search-input {
+                width: 100%;
+            }
+
+            .table-container {
+                overflow-x: auto;
+            }
+        }
+
+        .logout-section {
+            position: absolute;
+            bottom: 2rem;
+            left: 1rem;
+            right: 1rem;
+        }
+
+        .logout-button {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.5rem;
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+        }
+
+        .logout-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(239, 68, 68, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <div class="particles" id="particles"></div>
+    
+    <div class="container">
+        <div class="sidebar">
+            <div class="logo">
+                <h2>DEPI</h2>
+                <p>Instructor Dashboard</p>
+            </div>
+            <button class="nav-item active" onclick="showPage('dashboard')">
+                🏠 Dashboard
+            </button>
+            <button class="nav-item" onclick="showPage('feedback')">
+                💬 Feedback Management
+            </button>
+            <button class="nav-item" onclick="showPage('attendance')">
+                📊 Student Attendance
+            </button>
+            <a href="{{url_for('home')}}"><div class="logout-section">
+                <button class="logout-button">
+                    <span class="nav-icon"></span>
+                    Logout
+                </button>
+            </div></a>
+        </div>
+
+        <div class="main-content">
+            <!-- Dashboard Page -->
+           <!-- Dashboard Section -->
+        <div id="dashboard" class="content-section active">
+            <div class="profile-card">
+                <div class="profile-header">
+                    <div class="profile-avatar">
+                        <i class="fas fa-user fa-2x"></i>
+                    </div>
+                    <div class="profile-info">
+                        <h2>{{data[0]}}</h2>
+                        <p class="profile-code">#{{data[1]}}</p>
+                    </div>
+                </div>
+                
+                <div class="profile-details">
+                    <div class="detail-item">
+                        <i class="fas fa-bullseye"></i>
+                        <div>
+                            <div class="detail-label">Round</div>
+                            <div class="detail-value">Round 3</div>
+                        </div>
+                    </div>
+                    <div class="detail-item">
+                        <i class="fas fa-code"></i>
+                        <div>
+                            <div class="detail-label">Track</div>
+                            <div class="detail-value">{{data[3]}}</div>
+                        </div>
+                    </div>
+                    <div class="detail-item">
+                        <i class="fas fa-building"></i>
+                        <div>
+                            <div class="detail-label">Company</div>
+                            <div class="detail-value">{{data[4]}}</div>
+                        </div>
+                    </div>
+                    <div class="detail-item">
+                        <div>
+                            <div class="detail-label">Tyoe</div>
+                            <div class="detail-value">{{data[5]}}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+            <!-- Feedback Page -->
+            <div class="page" id="feedback">
+                <h1>Feedback Management</h1>
+                <button class="action-btn" onclick="openModal()">
+                    ✨ Add New Feedback
+                </button>
+                
+                <div class="search-container">
+                    <input type="text" class="search-input" placeholder="🔍 Search by Student Name..." 
+                           id="feedbackSearch" onkeyup="searchFeedback()">
+                </div>
+
+                <div class="table-container">
+                    <table id="feedbackTable">
+                        <thead>
+                            <tr>
+                                <th>Student Name</th>
+                                <th>Feedback</th>
+                                
+                            </tr>
+                        </thead>
+                        <tbody>
+                            
+                            {% for f in feed %}
+                            <tr>
+                                <td>{{ f[0] }}</td>
+                                <td>{{ f[1] }}</td>
+                                
+
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Attendance Page -->
+            <div class="page" id="attendance">
+                <h1>Student Attendance Overview</h1>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Student ID</th>
+                                <th>Student Name</th>
+                                <th>Group</th>
+                                <th>Attendance Rate</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for a in att %}
+                            <tr>
+                                <td>{{a[0]}}</td>
+                                <td>{{a[1]}}</td>
+                                <td>{{a[2]}}</td>
+                                <td><span class="attendance-rate attendance-high">{{a[3]}}%</span></td>
+                            </tr>
+                            {%endfor%}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Adding Feedback -->
+    <div class="modal" id="feedbackModal">
+        <div class="modal-content">
+            <h2>Add New Feedback</h2>
+            <form id="feedbackForm" action="{{ url_for('instruc', id=data[1]) }}" method="POST">
+                <div class="form-group">
+                    <label for="studentName">Student Name:</label>
+                    <input type="text" id="studentName" name = "stid" required placeholder="Enter student Id">
+                </div>
+                <div class="form-group">
+                    <label for="feedbackText">Feedback Details:</label>
+                    <textarea id="feedbackText" name = "feedback" required placeholder="Write detailed feedback about student's performance..."></textarea>
+                </div>
+                
+                <div class="modal-buttons">
+                    <button type="submit" class="btn btn-primary">Add Feedback</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Create floating particles matching DEPI theme
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            const colors = ['#4c63d2', '#667eea', '#625beb'];
+            
+            for (let i = 0; i < 30; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + 'vw';
+                particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+                particle.style.animationDuration = (Math.random() * 25 + 15) + 's';
+                particle.style.animationDelay = Math.random() * 25 + 's';
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        function showPage(pageId) {
+            // Hide all pages
+            const pages = document.querySelectorAll('.page');
+            pages.forEach(page => page.classList.remove('active'));
+            
+            // Remove active class from all nav items
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => item.classList.remove('active'));
+            
+            // Show selected page
+            document.getElementById(pageId).classList.add('active');
+            
+            // Add active class to clicked nav item
+            event.target.classList.add('active');
+        }
+
+        function openModal() {
+            document.getElementById('feedbackModal').classList.add('show');
+        }
+
+        function closeModal() {
+            document.getElementById('feedbackModal').classList.remove('show');
+            document.getElementById('feedbackForm').reset();
+        }
+
+        function searchFeedback() {
+            const input = document.getElementById('feedbackSearch');
+            const filter = input.value.toLowerCase();
+            const table = document.getElementById('feedbackTable');
+            const rows = table.getElementsByTagName('tr');
+
+            for (let i = 1; i < rows.length; i++) {
+                const studentName = rows[i].getElementsByTagName('td')[0];
+                if (studentName) {
+                    const textValue = studentName.textContent || studentName.innerText;
+                    if (textValue.toLowerCase().indexOf(filter) > -1) {
+                        rows[i].style.display = '';
+                    } else {
+                        rows[i].style.display = 'none';
+                    }
+                }
+            }
+        }
+
+        // Handle form submission with DEPI styling
+        document.getElementById('feedbackForm').addEventListener('submit', function(e) {
+            
+           
+            const currentDate = new Date().toLocaleDateString('en-US');
+            
+            // Add new row to table with smooth animation
+            const table = document.getElementById('feedbackTable').getElementsByTagName('tbody')[0];
+            const newRow = table.insertRow(0);
+            newRow.style.opacity = '0';
+            newRow.style.transform = 'translateY(-20px)';
+            
+            newRow.innerHTML = `
+                <td>${studentName}</td>
+                <td>${feedbackText}</td>
+                <td>${sessionId}</td>
+                <td>${currentDate}</td>
+            `;
+            
+            // Animate the new row with DEPI style
+            setTimeout(() => {
+                newRow.style.transition = 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
+                newRow.style.opacity = '1';
+                newRow.style.transform = 'translateY(0)';
+            }, 100);
+            
+            // Close modal and reset form
+            closeModal();
+            
+            // Show DEPI-styled success notification
+            showNotification('✅ Feedback added successfully!', 'success');
+        });
+
+        // Close modal when clicking outside
+        document.getElementById('feedbackModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+
+        // DEPI-styled notification system
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            const bgColor = type === 'success' ? 
+                'linear-gradient(135deg, #43e97b, #38f9d7)' : 
+                'linear-gradient(135deg, #4c63d2, #667eea)';
+            
+            notification.style.cssText = `
+                position: fixed;
+                top: 30px;
+                right: 30px;
+                background: ${bgColor};
+                color: white;
+                padding: 18px 25px;
+                border-radius: 15px;
+                font-weight: 600;
+                font-size: 16px;
+                box-shadow: 0 8px 25px rgba(76, 99, 210, 0.4);
+                z-index: 9999;
+                animation: slideInRight 0.5s ease, slideOutRight 0.5s ease 3s both;
+                border: 2px solid rgba(255, 255, 255, 0.2);
+                backdrop-filter: blur(10px);
+                min-width: 300px;
+                text-align: center;
+            `;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                if (document.body.contains(notification)) {
+                    document.body.removeChild(notification);
+                }
+            }, 3500);
+        }
+
+        // Add CSS for DEPI-styled notification animations
+        const notificationStyle = document.createElement('style');
+        notificationStyle.textContent = `
+            @keyframes slideInRight {
+                from {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+            
+            @keyframes slideOutRight {
+                from {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(notificationStyle);
+
+        // Initialize particles when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            createParticles();
+            
+            // Add DEPI-style loading animation
+            document.body.style.opacity = '0';
+            setTimeout(() => {
+                document.body.style.transition = 'opacity 0.8s ease';
+                document.body.style.opacity = '1';
+            }, 100);
+        });
+
+        // Enhanced mouse interaction effects for DEPI theme
+        document.addEventListener('mousemove', function(e) {
+            if (Math.random() > 0.95) {
+                const trail = document.createElement('div');
+                const colors = ['#4c63d2', '#667eea', '#625beb'];
+                const randomColor = colors[Math.floor(Math.random() * colors.length)];
+                
+                trail.style.cssText = `
+                    position: fixed;
+                    width: 4px;
+                    height: 4px;
+                    background: ${randomColor};
+                    border-radius: 50%;
+                    pointer-events: none;
+                    z-index: 9998;
+                    left: ${e.clientX - 2}px;
+                    top: ${e.clientY - 2}px;
+                    animation: trailFade 1.5s ease-out forwards;
+                    box-shadow: 0 0 10px ${randomColor};
+                `;
+                document.body.appendChild(trail);
+
+                setTimeout(() => {
+                    if (document.body.contains(trail)) {
+                        document.body.removeChild(trail);
+                    }
+                }, 1500);
+            }
+        });
+
+        // Add DEPI-styled trail fade animation
+        const trailStyle = document.createElement('style');
+        trailStyle.textContent = `
+            @keyframes trailFade {
+                0% {
+                    opacity: 1;
+                    transform: scale(1);
+                }
+                100% {
+                    opacity: 0;
+                    transform: scale(0.2);
+                }
+            }
+        `;
+        document.head.appendChild(trailStyle);
+
+        // Add ripple effect for buttons matching DEPI theme
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('action-btn') || 
+                e.target.classList.contains('btn') || 
+                e.target.classList.contains('nav-item')) {
+                
+                const button = e.target;
+                const ripple = document.createElement('span');
+                const rect = button.getBoundingClientRect();
+                const size = Math.max(rect.width, rect.height);
+                const x = e.clientX - rect.left - size / 2;
+                const y = e.clientY - rect.top - size / 2;
+                
+                ripple.style.cssText = `
+                    position: absolute;
+                    border-radius: 50%;
+                    background: rgba(255, 255, 255, 0.6);
+                    transform: scale(0);
+                    animation: ripple 0.8s ease-out;
+                    left: ${x}px;
+                    top: ${y}px;
+                    width: ${size}px;
+                    height: ${size}px;
+                    pointer-events: none;
+                `;
+                
+                button.style.position = 'relative';
+                button.style.overflow = 'hidden';
+                button.appendChild(ripple);
+                
+                setTimeout(() => {
+                    if (ripple.parentNode) {
+                        ripple.remove();
+                    }
+                }, 800);
+            }
+        });
+
+        // Add ripple animation CSS
+        const rippleStyle = document.createElement('style');
+        rippleStyle.textContent = `
+            @keyframes ripple {
+                to {
+                    transform: scale(4);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(rippleStyle);
+
+        // Add keyboard navigation support
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+
+        // Smooth scroll behavior for better UX
+        document.documentElement.style.scrollBehavior = 'smooth';
+    </script>
+</body>
+</html>

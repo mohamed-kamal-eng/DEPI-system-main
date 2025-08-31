@@ -1,0 +1,1262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Company Management System</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-blue: #4f7cee;
+            --light-blue: #e8f0ff;
+            --success-green: #10b981;
+            --warning-orange: #f59e0b;
+            --danger-red: #ef4444;
+            --text-dark: #1f2937;
+            --text-gray: #6b7280;
+            --text-light: #9ca3af;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --border-light: #e5e7eb;
+            --border-lighter: #f3f4f6;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+
+        /* Hidden radio buttons for navigation */
+        input[type="radio"] {
+            display: none;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 260px;
+            height: 100vh;
+            background: var(--bg-white);
+            border-right: 1px solid var(--border-light);
+            z-index: 1000;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-header {
+            padding: 24px 20px;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .sidebar-header h2 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sidebar-header i {
+            color: var(--primary-blue);
+        }
+
+        .nav-menu {
+            list-style: none;
+            padding: 16px;
+        }
+
+        .nav-item {
+            margin-bottom: 4px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            color: var(--text-gray);
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .nav-link:hover {
+            background-color: var(--light-blue);
+            color: var(--primary-blue);
+        }
+
+        .nav-link i {
+            margin-right: 12px;
+            width: 18px;
+            font-size: 16px;
+        }
+
+        /* Navigation active states */
+        #nav-dashboard:checked ~ .content-wrapper .sidebar .nav-link[for="nav-dashboard"],
+        #nav-instructors:checked ~ .content-wrapper .sidebar .nav-link[for="nav-instructors"],
+        #nav-students:checked ~ .content-wrapper .sidebar .nav-link[for="nav-students"],
+        #nav-coordinators:checked ~ .content-wrapper .sidebar .nav-link[for="nav-coordinators"],
+        #nav-groups:checked ~ .content-wrapper .sidebar .nav-link[for="nav-groups"] {
+            background-color: var(--primary-blue);
+            color: white;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 260px;
+            min-height: 100vh;
+            transition: margin-left 0.3s ease;
+        }
+
+        .header {
+            background: var(--bg-white);
+            padding: 16px 32px;
+            border-bottom: 1px solid var(--border-light);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .header-user {
+            color: var(--text-gray);
+            font-weight: 500;
+        }
+
+        /* Page Sections */
+        .page-section {
+            display: none;
+            padding: 32px;
+        }
+
+        #nav-dashboard:checked ~ .content-wrapper #dashboard,
+        #nav-instructors:checked ~ .content-wrapper #instructors,
+        #nav-students:checked ~ .content-wrapper #students,
+        #nav-coordinators:checked ~ .content-wrapper #coordinators,
+        #nav-groups:checked ~ .content-wrapper #groups {
+            display: block;
+        }
+
+        .section-header {
+            margin-bottom: 32px;
+        }
+
+        .section-title {
+            font-size: 1.875rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+        }
+
+        .section-subtitle {
+            color: var(--text-gray);
+            font-size: 1rem;
+        }
+
+        /* Dashboard Cards */
+        .dashboard-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+        }
+
+        .card {
+            background: var(--bg-white);
+            padding: 24px;
+            border-radius: 12px;
+            border: 1px solid var(--border-light);
+            transition: all 0.2s ease;
+        }
+
+        .card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .card-title {
+            font-size: 0.875rem;
+            color: var(--text-gray);
+            font-weight: 600;
+        }
+
+        .card-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+        }
+
+        .card-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 4px;
+        }
+
+        .card-subtitle {
+            font-size: 0.875rem;
+            color: var(--text-light);
+        }
+
+        /* Form Styles */
+        .form-toggle-buttons {
+            margin-bottom: 24px;
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .form-toggle-buttons input[type="radio"] {
+            display: none;
+        }
+
+        .btn-toggle {
+            padding: 10px 20px;
+            background: var(--bg-white);
+            border: 1px solid var(--border-light);
+            color: var(--text-gray);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-toggle:hover {
+            border-color: var(--primary-blue);
+            color: var(--primary-blue);
+        }
+
+        /* Form toggle states */
+        #show-instructor-form:checked ~ .form-card#instructorFormCard,
+        #show-student-form:checked ~ .form-card#studentFormCard,
+        #show-coordinator-form:checked ~ .form-card#coordinatorFormCard,
+        #show-group-form:checked ~ .form-card#groupFormCard {
+            display: block;
+        }
+
+        #show-instructor-form:checked ~ .form-toggle-buttons .btn-toggle[for="show-instructor-form"],
+        #show-student-form:checked ~ .form-toggle-buttons .btn-toggle[for="show-student-form"],
+        #show-coordinator-form:checked ~ .form-toggle-buttons .btn-toggle[for="show-coordinator-form"],
+        #show-group-form:checked ~ .form-toggle-buttons .btn-toggle[for="show-group-form"] {
+            background: var(--primary-blue);
+            border-color: var(--primary-blue);
+            color: white;
+        }
+
+        .form-card {
+            background: var(--bg-white);
+            padding: 32px;
+            border-radius: 12px;
+            border: 1px solid var(--border-light);
+            margin-bottom: 32px;
+            display: none;
+        }
+
+        .form-card h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+            color: var(--text-dark);
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid var(--border-light);
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.2s ease;
+            background: var(--bg-white);
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+        }
+
+        .form-actions {
+            margin-top: 24px;
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .btn-primary {
+            background: var(--primary-blue);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #3b6ce6;
+        }
+
+        .btn-secondary {
+            background: var(--border-light);
+            color: var(--text-gray);
+        }
+
+        .btn-secondary:hover {
+            background: #d1d5db;
+        }
+
+        .btn-success {
+            background: var(--success-green);
+            color: white;
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+        }
+
+        .btn-danger {
+            background: var(--danger-red);
+            color: white;
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        /* Table Styles */
+        .table-container {
+            background: var(--bg-white);
+            border-radius: 12px;
+            border: 1px solid var(--border-light);
+            overflow: hidden;
+        }
+
+        .table-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .table-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .search-box {
+            position: relative;
+            max-width: 300px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 8px 12px 8px 36px;
+            border: 1px solid var(--border-light);
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-light);
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table th,
+        .table td {
+            padding: 16px 24px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-lighter);
+        }
+
+        .table th {
+            background: var(--bg-light);
+            font-weight: 600;
+            color: var(--text-gray);
+            font-size: 14px;
+        }
+
+        .table td {
+            color: var(--text-dark);
+            font-size: 14px;
+        }
+
+        .table tbody tr:hover {
+            background: var(--bg-light);
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-excellent {
+            background: #dcfce7;
+            color: var(--success-green);
+        }
+
+        .status-good {
+            background: #fef3c7;
+            color: var(--warning-orange);
+        }
+
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .indicator-excellent { background: var(--success-green); }
+        .indicator-good { background: var(--warning-orange); }
+
+        .actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        /* Color variants for cards */
+        .card-blue { background: var(--primary-blue); }
+        .card-green { background: var(--success-green); }
+        .card-orange { background: var(--warning-orange); }
+        .card-red { background: var(--danger-red); }
+        .card-purple { background: #8b5cf6; }
+        .card-teal { background: #14b8a6; }
+        .card-pink { background: #ec4899; }
+        .card-indigo { background: #6366f1; }
+
+        /* Mobile Menu Toggle */
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.25rem;
+            color: var(--text-gray);
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 6px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .menu-toggle {
+                display: block;
+            }
+
+            #mobile-menu:checked ~ .content-wrapper .sidebar {
+                transform: translateX(0);
+            }
+
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .dashboard-cards {
+                grid-template-columns: 1fr;
+                padding: 20px;
+                gap: 16px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .page-section {
+                padding: 20px;
+            }
+
+            .header {
+                padding: 16px 20px;
+            }
+
+            .table-container {
+                overflow-x: auto;
+            }
+
+            .table {
+                min-width: 700px;
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
+
+            .btn {
+                justify-content: center;
+            }
+        }
+
+        /* Hide form radio buttons */
+        input[id^="show-"]:not(:checked) ~ .form-card {
+            display: none;
+        }
+        .logout-section {
+            position: absolute;
+            bottom: 2rem;
+            left: 1rem;
+            right: 1rem;
+        }
+
+        .logout-button {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.5rem;
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+        }
+
+        .logout-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(239, 68, 68, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Radio Buttons -->
+    <input type="radio" id="nav-dashboard" name="navigation" checked>
+    <input type="radio" id="nav-instructors" name="navigation">
+    <input type="radio" id="nav-students" name="navigation">
+    <input type="radio" id="nav-coordinators" name="navigation">
+    <input type="radio" id="nav-groups" name="navigation">
+    
+    <!-- Mobile Menu Toggle -->
+    <input type="checkbox" id="mobile-menu">
+
+    <div class="content-wrapper">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2><i class="fas fa-building"></i> CompanyMS</h2>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <label for="nav-dashboard" class="nav-link">
+                        <i class="fas fa-tachometer-alt"></i>
+                        Dashboard
+                    </label>
+                </li>
+                <li class="nav-item">
+                    <label for="nav-instructors" class="nav-link">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                        Instructors
+                    </label>
+                </li>
+                <li class="nav-item">
+                    <label for="nav-students" class="nav-link">
+                        <i class="fas fa-user-graduate"></i>
+                        Students
+                    </label>
+                </li>
+                <li class="nav-item">
+                    <label for="nav-coordinators" class="nav-link">
+                        <i class="fas fa-users-cog"></i>
+                        Coordinators
+                    </label>
+                </li>
+                <li class="nav-item">
+                    <label for="nav-groups" class="nav-link">
+                        <i class="fas fa-users"></i>
+                        Groups
+                    </label>
+                </li>
+                 <a href="{{url_for('home')}}"><div class="logout-section">
+                <button class="logout-button">
+                    <span class="nav-icon"></span>
+                    Logout
+                </button>
+            </div></a>
+            </ul>
+        </div>
+          
+        <div class="main-content">
+            <div class="header">
+                <label for="mobile-menu" class="menu-toggle">
+                    <i class="fas fa-bars"></i>
+                </label>
+                <h1>Company Management System</h1>
+                <div class="header-user">
+                    <span>Welcome, Admin</span>
+                </div>
+            </div>
+
+            <!-- Dashboard Section -->
+            <div id="dashboard" class="page-section">
+                <div class="section-header">
+                    <h2 class="section-title">Dashboard</h2>
+                    <p class="section-subtitle"></p>
+                </div>
+                <div class="dashboard-cards">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">Company ID</div>
+                            <div class="card-icon card-blue">
+                                <i class="fas fa-id-card"></i>
+                            </div>
+                        </div>
+                        <div class="card-value">{{data[0]}}</div>
+                        <div class="card-subtitle"></div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">Company Name</div>
+                            <div class="card-icon card-blue">
+                                <i class="fas fa-building"></i>
+                            </div>
+                        </div>
+                        <div class="card-value">{{data[1]}}</div>
+                        <div class="card-subtitle"></div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">Total Instructors</div>
+                            <div class="card-icon card-green">
+                                <i class="fas fa-chalkboard-teacher"></i>
+                            </div>
+                        </div>
+                        <div class="card-value">{{data[3]}}</div>
+                        <div class="card-subtitle">Active teaching professionals</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">Total Students</div>
+                            <div class="card-icon card-orange">
+                                <i class="fas fa-user-graduate"></i>
+                            </div>
+                        </div>
+                        <div class="card-value">{{data[4]}}</div>
+                        <div class="card-subtitle">Enrolled learners</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">Coordinators</div>
+                            <div class="card-icon card-purple">
+                                <i class="fas fa-users-cog"></i>
+                            </div>
+                        </div>
+                        <div class="card-value">{{data[2]}}</div>
+                        <div class="card-subtitle">Program managers</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">Active Groups</div>
+                            <div class="card-icon card-teal">
+                                <i class="fas fa-users"></i>
+                            </div>
+                        </div>
+                        <div class="card-value">{{data[5]}}</div>
+                        <div class="card-subtitle">Learning cohorts</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">Learning Tracks</div>
+                            <div class="card-icon card-pink">
+                                <i class="fas fa-road"></i>
+                            </div>
+                        </div>
+                        <div class="card-value">{{data[6]}}</div>
+                        <div class="card-subtitle">Available programs</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Instructors Section -->
+            <div id="instructors" class="page-section">
+                <div class="section-header">
+                    <h2 class="section-title">Instructors</h2>
+                    <p class="section-subtitle">Manage teaching professionals and their assignments</p>
+                </div>
+                
+                <!-- Form Toggle Radio Buttons -->
+                <input type="radio" id="show-instructor-form" name="instructor-toggle">
+                <input type="radio" id="hide-instructor-form" name="instructor-toggle" checked>
+                
+                <div class="form-toggle-buttons">
+                    <label for="show-instructor-form" class="btn-toggle">
+                        <i class="fas fa-plus"></i>
+                        Add New Instructor
+                    </label>
+                    <label for="hide-instructor-form" class="btn-toggle">
+                        <i class="fas fa-list"></i>
+                        View All
+                    </label>
+                </div>
+
+                <div class="form-card" id="instructorFormCard">
+                    <h3><i class="fas fa-user-plus"></i> Add/Edit Instructor</h3>
+                    <form action="{{ url_for('company', id=data[0]) }}" method="POST">
+                        <input type="hidden" name="form" value="ins_form">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="instructorId">ID</label>
+                                <input type="text" id="instructorId" name="iid" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="instructorName">Name</label>
+                                <input type="text" id="instructorName" name="iname" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="instructorType">Type</label>
+                                <select id="instructorType" name="itype" required>
+                                    <option value="">Select Type</option>
+                                    <option value="tech">Tech</option>
+                                    <option value="non-tech">Non-tech</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="instructorPhone">Phone</label>
+                                <input type="tel" id="instructorPhone" name="iphone" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="instructorBachelors">Bachelor's Degree</label>
+                                <input type="text" id="instructorBachelors" name="ibachelors" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="instructorFrom">From</label>
+                                <input type="text" id="instructorFrom" name="ifrom" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="instructorGender">Gender</label>
+                                <select id="instructorGender" name="igender" required>
+                                    <option value="">Select Gender</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="instructorEmail">Email</label>
+                                <input type="email" id="instructorEmail" name="iemail" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="instructorPassword">Password</label>
+                                <input type="password" id="instructorPassword" name="ipassword" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="instructorCityId">City ID</label>
+                                <input type="text" id="instructorCityId" name="ict_id" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="instructorRoundId">Round ID</label>
+                                <input type="text" id="instructorRoundId" name="iroundId" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="instructorTrackId">Track ID</label>
+                                <input type="text" id="instructorTrackId" name="itrackId" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="instructorGroupId">Group ID</label>
+                                <input type="text" id="instructorGroupId" name="igroupId" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="instructorCorId">Coordinator ID</label>
+                                <input type="text" id="instructorCorId" name="icorId" required>
+                            </div>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Save Instructor
+                            </button>
+                            <button type="reset" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Clear
+                            </button>
+                            <label for="hide-instructor-form" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Cancel
+                            </label>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="table-container">
+                    <div class="table-header">
+                        <h3 class="table-title">
+                            <i class="fas fa-chalkboard-teacher"></i>
+                            Instructors
+                        </h3>
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" placeholder="Search instructors...">
+                        </div>
+                    </div>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Type</th>
+                                <th>Email</th>
+                                <th>Track ID</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                           {% for i in ins %}
+                   <tr>
+                            <td>{{i[0]}}</td>
+                            <td>{{i[1]}}</td>
+                            <td>{{i[2]}}</td>
+                            <td>{{i[7]}}</td>
+                            <td>{{i[10]}}</td>
+                           
+                           
+                           </tr>
+                   
+                    {% endfor %}
+                           
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Students Section -->
+            <div id="students" class="page-section">
+                <div class="section-header">
+                    <h2 class="section-title">Students</h2>
+                    <p class="section-subtitle">Manage student records and enrollments</p>
+                </div>
+                
+                <input type="radio" id="show-student-form" name="student-toggle">
+                <input type="radio" id="hide-student-form" name="student-toggle" checked>
+                
+                <div class="form-toggle-buttons">
+                    <label for="show-student-form" class="btn-toggle">
+                        <i class="fas fa-plus"></i>
+                        Add New Student
+                    </label>
+                    <label for="hide-student-form" class="btn-toggle">
+                        <i class="fas fa-list"></i>
+                        View All
+                    </label>
+                </div>
+
+                <div class="form-card" id="studentFormCard">
+                    <h3><i class="fas fa-user-graduate"></i> Add/Edit Student</h3>
+                    <form action="{{ url_for('company', id=data[0]) }}" method="POST">
+                        <input type="hidden" name="form" value="std_form">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="studentId">ID</label>
+                                <input type="text" id="studentId" name="sid" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="studentName">Name</label>
+                                <input type="text" id="studentName" name="sname" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="studentGender">Gender</label>
+                                <select id="studentGender" name="sgender" required>
+                                    <option value="">Select Gender</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="studentUniversity">University</label>
+                                <input type="text" id="studentUniversity" name="suniversity" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="studentCollege">College</label>
+                                <input type="text" id="studentCollege" name="scollege" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="studentGrade">Grade</label>
+                                <select id="studentGrade" name="sgrade" required>
+                                    <option value="">Select Grade</option>
+                                    <option value="A">A</option>
+                                    <option value="B">B</option>
+                                    <option value="C">C</option>
+                                    <option value="D">D</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="studentphone">Phone</label>
+                                <input type="Phone" id="studentphone" name="sph" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="studentEmail">Email</label>
+                                <input type="email" id="studentEmail" name="semail" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="studentPassword">Password</label>
+                                <input type="password" id="studentPassword" name="spassword" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="studentcor">coordinator ID</label>
+                                <input type="text" id="studentcor" name="scor" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="studentTrackId">Track ID</label>
+                                <input type="text" id="studentTrackId" name="st" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="studentGroupId">Group ID</label>
+                                <input type="text" id="studentGroupId" name="sg" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="studentCity">City ID</label>
+                                <input type="text" id="studentCity" name="scity" required>
+                            </div>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Save Student
+                            </button>
+                            <button type="reset" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Clear
+                            </button>
+                            <label for="hide-student-form" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Cancel
+                            </label>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="table-container">
+                    <div class="table-header">
+                        <h3 class="table-title">
+                            <i class="fas fa-user-graduate"></i>
+                            Students
+                        </h3>
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" placeholder="Search students...">
+                        </div>
+                    </div>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>University</th>
+                                <th>Grade</th>
+                                <th>Group</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for s in std %}
+                   <tr>
+                            <td>{{s[0]}}</td>
+                            <td>{{s[1]}}</td>
+                            <td>{{s[2]}}</td>
+                            <td>{{s[3]}}</td>
+                            <td>{{s[4]}}</td>
+                            <td>{{s[5]}}</td>
+                        
+                           </tr>
+                   
+                    {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Coordinators Section -->
+            <div id="coordinators" class="page-section">
+                <div class="section-header">
+                    <h2 class="section-title">Coordinators</h2>
+                    <p class="section-subtitle">Manage program coordinators and their responsibilities</p>
+                </div>
+                
+                <input type="radio" id="show-coordinator-form" name="coordinator-toggle">
+                <input type="radio" id="hide-coordinator-form" name="coordinator-toggle" checked>
+                
+                <div class="form-toggle-buttons">
+                    <label for="show-coordinator-form" class="btn-toggle">
+                        <i class="fas fa-plus"></i>
+                        Add New Coordinator
+                    </label>
+                    <label for="hide-coordinator-form" class="btn-toggle">
+                        <i class="fas fa-list"></i>
+                        View All
+                    </label>
+                </div>
+
+                <div class="form-card" id="coordinatorFormCard">
+                    <h3><i class="fas fa-users-cog"></i> Add Coordinator</h3>
+                    <form action="{{ url_for('company', id=data[0]) }}" method="POST">
+                        <input type="hidden" name="form" value="cor_form">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="coordinatorId">ID</label>
+                                <input type="number" id="coordinatorId" name="cid" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="coordinatorName">Name</label>
+                                <input type="text" id="coordinatorName" name="cname" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="coordinatorCity">City ID</label>
+                                <input type="number" id="coordinatorCity" name="ccity" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="coordinatorFrom">From</label>
+                                <input type="text" id="coordinatorFrom" name="cfrom" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="coordinatorAge">Age</label>
+                                <input type="number" id="coordinatorAge" name="cage" required min="18" max="70">
+                            </div>
+                            <div class="form-group">
+                                <label for="coordinatorEmail">Email</label>
+                                <input type="email" id="coordinatorEmail" name="cemail" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="coordinatorPassword">Password</label>
+                                <input type="password" id="coordinatorPassword" name="cpassword" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="coordinatorGroupId">Group ID</label>
+                                <input type="text" id="coordinatorGroupId" name="cgroupId" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="coordinatorTrackId">Track ID</label>
+                                <input type="text" id="coordinatorTrackId" name="ct_id" required>
+                            </div>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Save Coordinator
+                            </button>
+                            <button type="reset" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Clear
+                            </button>
+                            <label for="hide-coordinator-form" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Cancel
+                            </label>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="table-container">
+                    <div class="table-header">
+                        <h3 class="table-title">
+                            <i class="fas fa-users-cog"></i>
+                            Coordinators
+                        </h3>
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" placeholder="Search coordinators...">
+                        </div>
+                    </div>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>City</th>
+                                <th>From</th>
+                                <th>Age</th>
+                                <th>Email</th>
+                                <th>Group</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for c in cor %}
+                        
+                           <tr>
+                            <td>{{c[0]}}</td>
+                            <td>{{c[1]}}</td>
+                            <td>{{c[2]}}</td>
+                            <td>{{c[3]}}</td>
+                            <td>{{c[4]}}</td>
+                            <td>{{c[5]}}</td>
+                            <td>{{c[6]}}</td>
+                           </tr>
+                      
+                        {% endfor %}
+                            
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Groups Section -->
+            <div id="groups" class="page-section">
+                <div class="section-header">
+                    <h2 class="section-title">Groups</h2>
+                    <p class="section-subtitle">Manage learning groups and their members</p>
+                </div>
+                
+                <input type="radio" id="show-group-form" name="group-toggle">
+                <input type="radio" id="hide-group-form" name="group-toggle" checked>
+                
+                <div class="form-toggle-buttons">
+                    <label for="show-group-form" class="btn-toggle">
+                        <i class="fas fa-plus"></i>
+                        Add New Group
+                    </label>
+                    <label for="hide-group-form" class="btn-toggle">
+                        <i class="fas fa-list"></i>
+                        View All
+                    </label>
+                </div>
+
+                <div class="form-card" id="groupFormCard">
+                    <h3><i class="fas fa-users"></i> Add/Edit Group</h3>
+                    <form action="{{ url_for('company', id=data[0]) }}" method="POST">
+                        <input type="hidden" name="form" value="g_form">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="groupName">Name</label>
+                                <input type="text" id="groupName" name="gname" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="groupCity">City</label>
+                                <input type="text" id="groupCity" name="gcity" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="groupRound">Round ID</label>
+                                <input type="number" id="groupRound" name="ground" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="groupTrack">Track ID</label>
+                                <input type="number" id="groupTrack" name="gtid" required>
+                            </div>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Save Group
+                            </button>
+                            <button type="reset" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Clear
+                            </button>
+                            <label for="hide-group-form" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Cancel
+                            </label>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="table-container">
+                    <div class="table-header">
+                        <h3 class="table-title">
+                            <i class="fas fa-users"></i>
+                            Groups
+                        </h3>
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" placeholder="Search groups...">
+                        </div>
+                    </div>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Mode</th>
+                                <th>Round</th>
+                                <th>Company</th>
+                                <th>Track</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for g in gr %}
+                            <tr>
+                                <td>{{ g[0] }}</td>
+                                <td>{{ g[1] }}</td>
+                                <td>{{ g[2] }}</td>
+                                <td>{{ g[3] }}</td>
+                                <td>{{ g[4] }}</td>
+                                <td>{{ g[5] }}</td>
+                            </tr>
+                            {% endfor %}
+                            
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

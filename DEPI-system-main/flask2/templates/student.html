@@ -1,0 +1,1172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard - DEPI</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa, #e4ecf8, #d8e1f1, #c3cfe2);
+            background-size: 400% 400%;
+            animation: gradientShift 18s ease infinite;
+            min-height: 100vh;
+            color: #333;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Decorative background blob */
+        body::before {
+            content: '';
+            position: fixed;
+            top: -120px;
+            right: -120px;
+            width: 340px;
+            height: 340px;
+            background: radial-gradient(circle at 30% 30%, rgba(99,102,241,0.35), rgba(139,92,246,0.2) 60%, transparent 70%);
+            filter: blur(20px);
+            border-radius: 50%;
+            animation: floatBlob 12s ease-in-out infinite;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* Navigation */
+        .navbar {
+            background: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #6366f1;
+            text-decoration: none;
+            letter-spacing: -0.5px;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .nav-link {
+            color: #64748b;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: #6366f1;
+        }
+
+        .profile-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .profile-icon:hover {
+            transform: scale(1.1);
+        }
+
+        /* Layout Container */
+        .layout-container {
+            display: flex;
+            min-height: calc(100vh - 80px);
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid rgba(99, 102, 241, 0.1);
+            padding: 2rem 0;
+            position: fixed;
+            height: calc(100vh - 80px);
+            overflow-y: auto;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-header {
+            padding: 0 2rem 2rem;
+            border-bottom: 1px solid rgba(99, 102, 241, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar-subtitle {
+            font-size: 0.9rem;
+            color: #64748b;
+        }
+
+        .sidebar-nav {
+            padding: 0 1rem;
+        }
+
+        .nav-item {
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-button {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.5rem;
+            background: transparent;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 500;
+            color: #64748b;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+        }
+
+        .nav-button:hover {
+            background: rgba(99, 102, 241, 0.08);
+            color: #6366f1;
+            transform: translateX(4px);
+        }
+
+        .nav-button.active {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.3);
+        }
+
+        .nav-button.active:hover {
+            transform: translateX(0) translateY(-1px);
+        }
+
+        .nav-icon {
+            font-size: 1.2rem;
+            width: 24px;
+            text-align: center;
+        }
+
+        .logout-section {
+            position: absolute;
+            bottom: 2rem;
+            left: 1rem;
+            right: 1rem;
+        }
+
+        .logout-button {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.5rem;
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+        }
+
+        .logout-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(239, 68, 68, 0.4);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            padding: 2rem;
+            transition: margin-left 0.3s ease;
+        }
+
+        .content-section {
+            display: none;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        /* Cards */
+        .card {
+            background: transparent;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 8px 32px transparent;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            margin-bottom: 2rem;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 48px transparent;
+        }
+
+        /* Dashboard Layout */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+        }
+
+        /* Profile Card */
+        .profile-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: bold;
+            border: 3px solid rgba(255,255,255,0.3);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+            animation: pulseGlow 2.4s ease-in-out infinite;
+        }
+
+        .profile-info h2 {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .student-code {
+            opacity: 0.9;
+            font-size: 1rem;
+        }
+
+        .profile-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .detail-item {
+            background: rgba(255,255,255,0.1);
+            padding: 1rem;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+
+        .detail-label {
+            font-size: 0.85rem;
+            opacity: 0.8;
+            margin-bottom: 0.5rem;
+        }
+
+        .detail-value {
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        /* Attendance Progress */
+        .attendance-section {
+            text-align: center;
+        }
+
+        .attendance-title {
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .progress-container {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            margin: 0 auto;
+        }
+
+        .progress-ring {
+            transform: rotate(-90deg);
+        }
+
+        .progress-ring-circle {
+            stroke: rgba(255,255,255,0.2);
+            fill: transparent;
+            stroke-width: 8;
+            stroke-linecap: round;
+        }
+
+        .progress-ring-progress {
+            stroke: rgba(255,255,255,0.2);
+            fill: transparent;
+            stroke-width: 8;
+            stroke-linecap: round;
+            transition: stroke-dasharray 0.5s ease-in-out;
+        }
+
+        .progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        /* Upcoming Session Card */
+        .upcoming-session {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            color: #8b4513;
+            background-size: 200% 200%;
+            animation: shimmer 6s ease-in-out infinite;
+        }
+
+        .session-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .session-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .session-mode {
+            font-size: 1.5rem;
+        }
+
+        .session-details {
+            space-y: 1rem;
+        }
+
+        .session-detail {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 0.8rem;
+            padding: 0.8rem;
+            background: rgba(255,255,255,0.3);
+            border-radius: 10px;
+        }
+
+        .session-label {
+            font-weight: 600;
+            margin-right: auto;
+        }
+
+        .session-value {
+            font-weight: 500;
+        }
+
+        /* Chart Card */
+        .chart-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+            color: #1f2937;
+            text-align: center;
+        }
+
+        #attendanceChart {
+            max-height: 300px;
+        }
+
+        /* Sessions Table */
+        .sessions-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .sessions-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #1f2937;
+        }
+
+        .search-container {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .search-input {
+            padding: 0.75rem 1rem;
+            border-radius: 12px;
+            border: 2px solid #e5e7eb;
+            outline: none;
+            font-size: 1rem;
+            width: 250px;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99,102,241,0.15);
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        thead {
+            background: linear-gradient(135deg, #eef2ff 0%, #e9d5ff 100%);
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            color: #374151;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        th {
+            font-weight: 700;
+            color: #4f46e5;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        tbody tr {
+            transition: all 0.3s ease;
+        }
+
+        tbody tr:hover {
+            background: #f8fafc;
+            transform: translateX(2px);
+        }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.4rem 0.8rem;
+            border-radius: 999px;
+            font-weight: 700;
+            font-size: 0.85rem;
+        }
+
+        .status-present {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        .status-absent {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .status-pending {
+            background: #e5e7eb;
+            color: #374151;
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                z-index: 1000;
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .navbar {
+                padding: 1rem;
+            }
+
+            .logo {
+                font-size: 1.5rem;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .profile-details {
+                grid-template-columns: 1fr;
+            }
+
+            .card {
+                padding: 1.5rem;
+            }
+
+            .sessions-header {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: flex-start;
+            }
+
+            .search-input {
+                width: 100%;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes floatBlob {
+            0%, 100% { transform: translate(0,0) scale(1); }
+            50% { transform: translate(-20px, 10px) scale(1.08); }
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 8px 24px rgba(0,0,0,0.12), 0 0 0 0 rgba(255,255,255,0.35); }
+            50% { box-shadow: 0 10px 28px rgba(0,0,0,0.16), 0 0 0 10px rgba(255,255,255,0); }
+        }
+
+        @keyframes shimmer {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .card {
+            animation: fadeInUp 0.6s ease-out;
+            will-change: transform, box-shadow;
+        }
+
+        .card:nth-child(2) {
+            animation-delay: 0.1s;
+        }
+
+        .card:nth-child(3) {
+            animation-delay: 0.2s;
+        }
+
+        /* Mobile Menu Button */
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: #6366f1;
+            cursor: pointer;
+        }
+
+        @media (max-width: 768px) {
+            .mobile-menu-btn {
+                display: block;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <button class="mobile-menu-btn" onclick="toggleSidebar()">☰</button>
+        <a href="#" class="logo">DEPI</a>
+        <div class="nav-right">
+            <a href="#" class="nav-link">Home</a>
+            <div class="profile-icon" id="profileIcon"><i class="fa-solid fa-circle-user"></i></div>
+        </div>
+    </nav>
+
+    <!-- Layout Container -->
+    <div class="layout-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h3 class="sidebar-title">Student :</h3>
+                <p class="sidebar-subtitle">{{name}}</p>
+            </div>
+
+            <nav class="sidebar-nav">
+                <div class="nav-item">
+                    <button class="nav-button active" onclick="showSection('dashboard')" data-section="dashboard">
+                        <span class="nav-icon">📊</span>
+                        Dashboard
+                    </button>
+                </div>
+                
+            </nav>
+
+            <a href="{{url_for('home')}}"><div class="logout-section">
+                <button class="logout-button">
+                    <span class="nav-icon"></span>
+                    Logout
+                </button>
+            </div></a>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Dashboard Section -->
+            <div id="dashboard" class="content-section active">
+                <div class="dashboard-grid">
+                    <div class="dashboard-left">
+                        <!-- Profile Card -->
+                        <div class="card profile-card">
+                            <div class="profile-header">
+                                <div class="profile-avatar" id="avatarInitials"><i class="fa-solid fa-circle-user"></i></div>
+                                <div class="profile-info">
+                                    <h2>{{name}}</h2>
+                                    <p class="student-code">#{{id}}</p>
+                                </div>
+                            </div>
+
+                            <div class="profile-details">
+                                <div class="detail-item">
+                                    <div class="detail-label">Round</div>
+                                    <div class="detail-value">Round 3</div>
+                                </div>
+                                <div class="detail-item">
+                                    <div class="detail-label">Track</div>
+                                    <div class="detail-value">{{track}}</div>
+                                </div>
+                                <div class="detail-item">
+                                    <div class="detail-label">City</div>
+                                    <div class="detail-value">{{city}}</div>
+                                </div>
+                                <div class="detail-item">
+                                    <div class="detail-label">Instructor</div>
+                                    <div class="detail-value">{{inst}}</div>
+                                </div>
+                            </div>
+
+                            <div class="attendance-section">
+                                <div class="attendance-title">Attendance Rate</div>
+                                <div class="progress-container">
+                                    <svg class="progress-ring" width="120" height="120">
+                                        <circle class="progress-ring-circle" cx="60" cy="60" r="50"></circle>
+                                        <circle class="progress-ring-progress" cx="60" cy="60" r="50" 
+                                                stroke-dasharray="0 314" id="progress-circle"></circle>
+                                    </svg>
+                                    <div class="progress-text" id="progress-text">{{per}}%</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Attendance Chart -->
+                        <div class="card">
+                            <h3 class="chart-title"></h3>
+                            <canvas id="attendanceChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-right">
+                        <!-- Upcoming Session -->
+                        <div class="card upcoming-session">
+                            <div class="session-header">
+                                <h3 class="session-title">Next Session</h3>
+                                <span class="session-mode">📡</span>
+                            </div>
+                            
+                            <div class="session-details">
+                                <div class="session-detail">
+                                    <span class="session-label">Session:</span>
+                                    <span class="session-value">{{ses[0]}}</span>
+                                </div>
+                                <div class="session-detail">
+                                    <span class="session-label">Type:</span>
+                                    <span class="session-value">{{ses[1]}}</span>
+                                </div>
+                                <div class="session-detail">
+                                    <span class="session-label">Date:</span>
+                                    <span class="session-value">{{ses[2]}}</span>
+                                </div>
+                                <div class="session-detail">
+                                    <span class="session-label">Instructor :</span>
+                                    <span class="session-value">{{ses[3]}}</span>
+                                </div>
+                                <div class="session-detail">
+                                    <span class="session-label">Mode:</span>
+                                    <span class="session-value">{{ses[4]}}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sessions Section -->
+            <div id="sessions" class="content-section">
+                <div class="card">
+                    <div class="sessions-header">
+                        <h2 class="sessions-title">All Sessions</h2>
+                        <div class="search-container">
+                            <input 
+                                id="searchSession" 
+                                class="search-input" 
+                                type="number" 
+                                placeholder="Search by session number..."
+                            />
+                        </div>
+                    </div>
+
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Session #</th>
+                                    <th>Tech / Non-Tech</th>
+                                    <th>Instructor</th>
+                                    <th>Online / Offline</th>
+                                    <th>Session Date</th>
+                                    <th>Week</th>
+                                    <th>Attendance</th>
+                                </tr>
+                            </thead>
+                            <tbody id="sessionsBody">
+                                <!-- Sessions will be populated here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Sample sessions data - Extended with more sessions
+      
+    
+        
+
+        let currentFilteredSessions = [...sessionsData];
+
+        // Navigation functions
+        function showSection(sectionName) {
+            console.log('Switching to section:', sectionName);
+            
+            // Hide all sections
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+
+            // Show selected section
+            const targetSection = document.getElementById(sectionName);
+            if (targetSection) {
+                targetSection.classList.add('active');
+                console.log('Section', sectionName, 'activated');
+            } else {
+                console.error('Section not found:', sectionName);
+            }
+
+            // Update navigation buttons
+            document.querySelectorAll('.nav-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            const activeBtn = document.querySelector(`[data-section="${sectionName}"]`);
+            if (activeBtn) {
+                activeBtn.classList.add('active');
+            }
+
+            // Special handling for sessions section
+            if (sectionName === 'sessions') {
+                console.log('Loading sessions data...');
+                // Force re-render sessions when switching to sessions tab
+                setTimeout(() => {
+                    renderSessions(sessionsData);
+                    console.log('Sessions re-rendered for section switch');
+                }, 50);
+            }
+
+            // Close sidebar on mobile after selection
+            if (window.innerWidth <= 768) {
+                const sidebar = document.getElementById('sidebar');
+                if (sidebar) {
+                    sidebar.classList.remove('open');
+                }
+            }
+        }
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+        }
+
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                // Clear any stored session data
+                sessionStorage.clear();
+                localStorage.removeItem('studentLoggedIn');
+                
+                // Redirect to login/home page
+                window.location.href = 'index.html';
+            }
+        }
+
+        // Function to show session details
+        function showSessionDetails(session) {
+            console.log('Showing details for session:', session);
+            
+            // Remove existing modal if any
+            const existingModal = document.getElementById('sessionModal');
+            if (existingModal) {
+                document.body.removeChild(existingModal);
+            }
+            
+            // Create new modal
+            const modal = document.createElement('div');
+            modal.id = 'sessionModal';
+            modal.style.position = 'fixed';
+            modal.style.top = '0';
+            modal.style.left = '0';
+            modal.style.width = '100%';
+            modal.style.height = '100%';
+            modal.style.backgroundColor = 'rgba(0,0,0,0.5)';
+            modal.style.zIndex = '1000';
+            modal.style.display = 'flex';
+            modal.style.justifyContent = 'center';
+            modal.style.alignItems = 'center';
+            
+            // Create modal content
+            const statusText = session.status === 'present' ? '✅ Present' : 
+                             session.status === 'absent' ? '❌ Absent' : '⚪ Pending';
+            
+            modal.innerHTML = `
+                <div style="background: white; padding: 2rem; border-radius: 12px; width: 90%; max-width: 500px; max-height: 90vh; overflow-y: auto; box-shadow: 0 4px 20px rgba(0,0,0,0.2);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid #eee;">
+                        <h2 style="margin: 0; font-size: 1.5rem; color: #333;">Session #${session.session} Details</h2>
+                        <button id="closeModalBtn" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #666;">&times;</button>
+                    </div>
+                    <div style="display: grid; gap: 1rem; margin-bottom: 2rem;">
+                        <div style="display: flex; justify-content: space-between; padding: 0.75rem; background: #f8fafc; border-radius: 8px;">
+                            <span style="font-weight: 600; color: #64748b;">Type:</span>
+                            <span>${session.type}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; padding: 0.75rem; background: #f8fafc; border-radius: 8px;">
+                            <span style="font-weight: 600; color: #64748b;">Instructor:</span>
+                            <span>${session.instructor}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; padding: 0.75rem; background: #f8fafc; border-radius: 8px;">
+                            <span style="font-weight: 600; color: #64748b;">Mode:</span>
+                            <span>${session.mode}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; padding: 0.75rem; background: #f8fafc; border-radius: 8px;">
+                            <span style="font-weight: 600; color: #64748b;">Date:</span>
+                            <span>${session.date}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; padding: 0.75rem; background: #f8fafc; border-radius: 8px;">
+                            <span style="font-weight: 600; color: #64748b;">Week:</span>
+                            <span>Week ${session.week}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; padding: 0.75rem; background: #f8fafc; border-radius: 8px;">
+                            <span style="font-weight: 600; color: #64748b;">Status:</span>
+                            <span>${statusText}</span>
+                        </div>
+                    </div>
+                    <button style="width: 100%; padding: 0.75rem; background: #4f46e5; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 1rem; transition: background 0.2s;" 
+                            onmouseover="this.style.background='#4338ca'" 
+                            onmouseout="this.style.background='#4f46e5'">
+                        Close
+                    </button>
+                </div>
+            `;
+            
+            // Add modal to body
+            document.body.appendChild(modal);
+            
+            // Add event listeners
+            const closeBtn = modal.querySelector('button');
+            closeBtn.addEventListener('click', () => {
+                modal.style.display = 'none';
+            });
+            
+            // Close when clicking outside modal content
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+            
+            // Close with Escape key
+            document.addEventListener('keydown', function handleEscape(e) {
+                if (e.key === 'Escape') {
+                    modal.style.display = 'none';
+                    document.removeEventListener('keydown', handleEscape);
+                }
+            });
+        }
+
+        // Sessions table functions
+        function renderSessions(sessions) {
+            console.log('Rendering sessions:', sessions.length, 'sessions');
+            const tbody = document.getElementById('sessionsBody');
+            
+            if (!tbody) {
+                console.error('Sessions table body not found!');
+                return;
+            }
+            
+            tbody.innerHTML = '';
+
+            sessions.forEach((session, index) => {
+                const row = document.createElement('tr');
+                row.style.animation = 'fadeInUp 0.4s ease both';
+                row.style.animationDelay = (index * 50) + 'ms';
+                row.style.cursor = 'pointer';
+                
+                // Add click handler to the row
+                row.addEventListener('click', () => {
+                    showSessionDetails(session);
+                });
+
+                const statusClass = session.status === 'present' ? 'status-present' : 
+                                  session.status === 'absent' ? 'status-absent' : 'status-pending';
+                const statusIcon = session.status === 'present' ? '✅' : 
+                                 session.status === 'absent' ? '❌' : '⚪';
+                const statusText = session.status === 'present' ? 'Present' : 
+                                 session.status === 'absent' ? 'Absent' : 'Pending';
+
+                row.innerHTML = `
+                    <td><strong>#${session.session}</strong></td>
+                    <td><span style="padding: 0.25rem 0.5rem; background: ${session.type === 'Tech' ? '#dbeafe' : '#fef3c7'}; color: ${session.type === 'Tech' ? '#1e40af' : '#92400e'}; border-radius: 6px; font-size: 0.875rem; font-weight: 600;">${session.type}</span></td>
+                    <td>${session.instructor}</td>
+                    <td><span style="padding: 0.25rem 0.5rem; background: ${session.mode === 'Online' ? '#ecfdf5' : '#f3e8ff'}; color: ${session.mode === 'Online' ? '#166534' : '#7c2d92'}; border-radius: 6px; font-size: 0.875rem; font-weight: 600;">${session.mode}</span></td>
+                    <td>${session.date}</td>
+                    <td>W${session.week}</td>
+                    <td><span class="status-pill ${statusClass}">${statusIcon} ${statusText}</span></td>
+                `;
+
+                tbody.appendChild(row);
+            });
+
+            if (sessions.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 2rem; color: #64748b; font-style: italic;">No sessions found matching your search</td></tr>';
+            }
+            
+            console.log('Sessions table updated with', sessions.length, 'rows');
+        }
+
+        function filterSessions() {
+            const searchValue = document.getElementById('searchSession').value;
+            
+            if (searchValue === '') {
+                currentFilteredSessions = [...sessionsData];
+            } else {
+                const sessionNumber = parseInt(searchValue);
+                currentFilteredSessions = sessionsData.filter(session => 
+                    session.session === sessionNumber
+                );
+            }
+            
+            renderSessions(currentFilteredSessions);
+        }
+
+        // Attendance progress circle
+        function updateAttendanceProgress(percentage) {
+            const circle = document.getElementById('progress-circle');
+            const text = document.getElementById('progress-text');
+            const circumference = 2 * Math.PI * 50;
+            const offset = circumference - (percentage / 100) * circumference;
+            
+            text.textContent = Math.round(percentage) + '%';
+            
+            setTimeout(() => {
+                circle.style.strokeDasharray = circumference + ' ' + circumference;
+                circle.style.strokeDashoffset = offset;
+            }, 300);
+        }
+
+        // Attendance Chart
+        function createAttendanceChart() {
+            const ctx = document.getElementById('attendanceChart').getContext('2d');
+            
+            const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+            gradient.addColorStop(0, 'rgba(99, 102, 241, 0.3)');
+            gradient.addColorStop(1, 'rgba(99, 102, 241, 0.05)');
+            
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6', 'Week 7', 'Week 8'],
+                    datasets: [{
+                        label: 'Sessions Attended',
+                        data: [2, 1, 2, 1, 2, 0, 0, 0], // Based on sample data
+                        borderColor: '#6366f1',
+                        backgroundColor: gradient,
+                        borderWidth: 3,
+                        pointBackgroundColor: '#6366f1',
+                        pointBorderColor: '#ffffff',
+                        pointBorderWidth: 3,
+                        pointRadius: 6,
+                        pointHoverRadius: 8,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                            backgroundColor: 'rgba(99, 102, 241, 0.9)',
+                            titleColor: '#ffffff',
+                            bodyColor: '#ffffff',
+                            borderColor: '#6366f1',
+                            borderWidth: 1,
+                            cornerRadius: 10,
+                            displayColors: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                color: '#64748b',
+                                font: {
+                                    weight: 500
+                                }
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            max: 3,
+                            grid: {
+                                color: 'rgba(148, 163, 184, 0.1)'
+                            },
+                            ticks: {
+                                color: '#64748b',
+                                font: {
+                                    weight: 500
+                                }
+                            }
+                        }
+                    },
+                    interaction: {
+                        mode: 'nearest',
+                        axis: 'x',
+                        intersect: false
+                    }
+                }
+            });
+        }
+
+        // Calculate attendance percentage
+        function calculateAttendancePercentage() {
+            const completedSessions = sessionsData.filter(s => s.status !== 'pending');
+            const attendedSessions = completedSessions.filter(s => s.status === 'present');
+            
+            if (completedSessions.length === 0) return 0;
+            
+            return (attendedSessions.length / completedSessions.length) * 100;
+        }
+
+        // Initialize the dashboard
+      
+
+            // Initialize attendance chart
+            createAttendanceChart();
+            
+            // Update attendance progress
+            const attendancePercentage = calculateAttendancePercentage();
+            updateAttendanceProgress(attendancePercentage);
+            
+            // Render sessions table
+            renderSessions(sessionsData);
+            
+            // Set up search functionality
+            document.getElementById('searchSession').addEventListener('input', filterSessions);
+            
+            // Close sidebar when clicking outside on mobile
+            document.addEventListener('click', function(event) {
+                const sidebar = document.getElementById('sidebar');
+                const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+                
+                if (window.innerWidth <= 768 && 
+                    !sidebar.contains(event.target) && 
+                    !mobileMenuBtn.contains(event.target)) {
+                    sidebar.classList.remove('open');
+                }
+            });
+        
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeDashboard();
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 768) {
+                document.getElementById('sidebar').classList.remove('open');
+            }
+        });
+        </script>
+</body></html>

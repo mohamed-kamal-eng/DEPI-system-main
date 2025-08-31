@@ -1,0 +1,1737 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DEPI Platform</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f8f9ff;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 80px;
+            background: white;
+            position: relative;
+            z-index: 1000;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0;
+        }
+
+        .logo-text {
+            font-size: 32px;
+            font-weight: 800;
+            color: #4c63d2;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .logo-accent {
+            color: #4c63d2;
+        }
+
+        .logo:hover .logo-text {
+            transform: scale(1.05);
+        }
+
+        .nav-center {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            list-style: none;
+            margin-right: 20px;
+        }
+
+        .nav-item {
+            position: relative;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: #555;
+            font-weight: 500;
+            font-size: 16px;
+            padding: 8px 0;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #4c63d2, #764ba2);
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+        }
+
+        .nav-link:hover {
+            color: #4c63d2;
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .depi-brand {
+            font-size: 24px;
+            font-weight: 700;
+            color: #4c63d2;
+            letter-spacing: 1px;
+        }
+
+        .dropdown {
+            position: relative;
+        }
+
+        .login-btn {
+            background: linear-gradient(135deg, #4c63d2, #667eea);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 15px rgba(76, 99, 210, 0.3);
+        }
+
+        .login-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.6s;
+        }
+
+        .login-btn:hover::before {
+            left: 100%;
+        }
+
+        .login-btn:hover {
+            background: linear-gradient(135deg, #3b4fd6, #5a73ea);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(76, 99, 210, 0.4);
+        }
+
+        .dropdown-arrow {
+            transition: transform 0.3s ease;
+            font-size: 12px;
+        }
+
+        .dropdown.active .dropdown-arrow {
+            transform: rotate(180deg);
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: calc(100% + 15px);
+            right: 0;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            min-width: 220px;
+            overflow: hidden;
+            border: 1px solid rgba(76, 99, 210, 0.1);
+        }
+
+        .dropdown.active .dropdown-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dropdown-item {
+            display: block;
+            padding: 15px 20px;
+            text-decoration: none;
+            color: #333;
+            transition: all 0.3s ease;
+            position: relative;
+            font-weight: 500;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            opacity: 0;
+            transform: translateX(20px);
+        }
+
+        .dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown.active .dropdown-item {
+            animation: slideInLeft 0.4s ease forwards;
+        }
+
+        .dropdown.active .dropdown-item:nth-child(1) { animation-delay: 0.1s; }
+        .dropdown.active .dropdown-item:nth-child(2) { animation-delay: 0.15s; }
+        .dropdown.active .dropdown-item:nth-child(3) { animation-delay: 0.2s; }
+        .dropdown.active .dropdown-item:nth-child(4) { animation-delay: 0.25s; }
+
+        @keyframes slideInLeft {
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .dropdown-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 0;
+            height: 100%;
+            background: linear-gradient(135deg, #4c63d2, #667eea);
+            transition: width 0.3s ease;
+        }
+
+        .dropdown-item:hover::before {
+            width: 4px;
+        }
+
+        .dropdown-item:hover {
+            color: #4c63d2;
+            background: rgba(76, 99, 210, 0.05);
+            transform: translateX(8px);
+        }
+
+        /* Hero Section */
+        .hero {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 80px;
+            background: linear-gradient(135deg, #f8f9ff 0%, #e8f2ff 100%);
+            min-height: 80vh;
+            overflow: hidden;
+        }
+
+        .hero-content {
+            flex: 1;
+            max-width: 500px;
+        }
+
+        .welcome-text {
+            color: #4c63d2;
+            font-size: 18px;
+            font-weight: 500;
+            margin-bottom: 20px;
+            opacity: 0;
+            animation: fadeInUp 0.8s ease forwards;
+            animation-delay: 0.2s;
+        }
+
+        .hero-title {
+            font-size: 48px;
+            font-weight: 700;
+            color: #1a1a1a;
+            line-height: 1.2;
+            margin-bottom: 30px;
+            opacity: 0;
+            animation: fadeInUp 0.8s ease forwards;
+            animation-delay: 0.4s;
+        }
+
+        .hero-title .accent {
+
+  
+  display: inline-block;
+  font-weight: bold;
+  font-size: 2rem;
+  color: #625beb;
+  white-space: nowrap;
+  overflow: hidden;
+  border-right: 3px solid #625beb;
+  width: 0;
+  animation: typing 5s steps(17) infinite, blink 0.7s step-end infinite;
+}
+
+@keyframes typing {
+  0% {
+    width: 0ch;
+  }
+  50% {
+    width: 17ch; 
+  }
+  100% {
+    width: 0ch;
+  }
+}
+
+@keyframes blink {
+  50% {
+    border-color: transparent;
+  }
+}
+
+
+
+        .hero-buttons {
+            display: flex;
+            gap: 20px;
+            opacity: 0;
+            animation: fadeInUp 0.8s ease forwards;
+            animation-delay: 0.6s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #4c63d2, #667eea);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(76, 99, 210, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(76, 99, 210, 0.4);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: #4c63d2;
+            border: 2px solid #4c63d2;
+            padding: 13px 30px;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-secondary:hover {
+            background: #4c63d2;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+       
+    .hero-image {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      opacity: 0;
+      animation: fadeInRight 1s ease forwards;
+      animation-delay: 0.8s;
+    }
+
+    .robot-illustration {
+      width: 400px;
+      height: 400px;
+      background: linear-gradient(135deg, #a8b7ff, #c4b5fd);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden; 
+      animation: float 6s ease-in-out infinite;
+      box-shadow: 0 0 40px rgba(76, 99, 210, 0.3); 
+      transition: transform 0.4s ease, box-shadow 0.4s ease;
+    }
+
+    .robot-illustration img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* Hover Effect */
+    .robot-illustration:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 60px rgba(76, 99, 210, 0.5);
+    }
+
+  
+  /* Stats Section */
+.stats {
+  min-height: auto;  
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  padding: 30px;   
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.card {
+  background: rgba(255, 255, 255, 0.05); 
+  border: 2px solid #d4d3d3; 
+  border-radius: 20px;
+  backdrop-filter: blur(10px);
+  text-align: center;
+  padding: 20px 15px;
+  box-shadow: 0 2px 7px rgba(100, 100, 100, 0.3);
+  transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
+}
+
+.card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+  border-color: #e4d4ff; 
+}
+
+
+.card i {
+  font-size: 2rem;   
+  margin-bottom: 12px;
+  display: block;
+}
+
+.number {
+  font-size: 2rem;   
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.label {
+  font-size: 1rem;  
+}
+
+  
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInRight {
+            from {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 15px 20px;
+                flex-wrap: wrap;
+            }
+
+            .nav-center {
+                gap: 20px;
+            }
+
+            .hero {
+                flex-direction: column;
+                text-align: center;
+                padding: 40px 20px;
+            }
+
+            .hero-title {
+                font-size: 36px;
+            }
+
+            .robot-illustration {
+                width: 300px;
+                height: 300px;
+            }
+        }
+
+        /* Features Section */
+        .features {
+            padding: 80px 0;
+            background: #f8f9ff;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .section-title h2 {
+            font-size: 2.8rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 16px;
+            line-height: 1.2;
+        }
+
+        .section-title p {
+            font-size: 1.1rem;
+            color: #64748b;
+            max-width: 600px;
+            margin: 0 auto;
+            font-weight: 400;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 32px;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 40px 32px;
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.08);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 40px rgba(102, 126, 234, 0.15);
+        }
+
+        .feature-icon {
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 24px;
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .feature-card h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 12px;
+            line-height: 1.3;
+        }
+
+        .feature-card p {
+            color: #64748b;
+            line-height: 1.6;
+            font-size: 0.95rem;
+        }
+
+        /* About Section */
+        .about {
+            padding: 80px 0;
+            background: white;
+        }
+
+        .about-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 80px;
+            align-items: center;
+        }
+
+        .about-text h2 {
+            font-size: 2.5rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 24px;
+            line-height: 1.2;
+        }
+
+        .about-text p {
+            color: #64748b;
+            margin-bottom: 24px;
+            font-size: 1rem;
+            line-height: 1.7;
+        }
+
+        .about-features {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-top: 32px;
+        }
+
+        .about-feature {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .about-feature i {
+            color: #667eea;
+            font-size: 1.2rem;
+        }
+
+        .about-feature span {
+            color: #2d3748;
+            font-weight: 500;
+        }
+
+        .about-image {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .image-container {
+            width: 400px;
+            height: 400px;
+            background: linear-gradient(135deg, #e6f2ff, #f0f4ff);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            border: 1px solid rgba(102, 126, 234, 0.1);
+        }
+
+        .image-container::before {
+            content: '';
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 50%;
+            opacity: 0.1;
+        }
+
+        .image-container i {
+            font-size: 4rem;
+            color: #667eea;
+            z-index: 2;
+        }
+
+        /* Testimonials Section */
+        .testimonials {
+            padding: 80px 0;
+            background: #f8f9ff;
+        }
+
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 32px;
+            margin-top: 60px;
+        }
+
+        .testimonial-card {
+            background: white;
+            padding: 32px;
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.08);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            position: relative;
+        }
+
+        .testimonial-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 20px 20px 0 0;
+        }
+
+        .testimonial-quote {
+            font-size: 1rem;
+            color: #4a5568;
+            line-height: 1.7;
+            margin-bottom: 24px;
+            font-style: italic;
+        }
+
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .author-avatar {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: white;
+            font-size: 1rem;
+        }
+
+        .author-info h4 {
+            color: #2d3748;
+            font-weight: 600;
+            font-size: 1rem;
+            margin-bottom: 4px;
+        }
+
+        .author-info span {
+            color: #64748b;
+            font-size: 0.875rem;
+        }
+
+        .rating {
+            margin-top: 16px;
+            color: #fbbf24;
+            font-size: 0.875rem;
+        }
+
+        /* Newsletter Section */
+        .newsletter {
+            padding: 80px 0;
+            background: white;
+            border-top: 1px solid rgba(226, 232, 240, 0.8);
+        }
+
+        .newsletter-content {
+            max-width: 600px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .newsletter h2 {
+            font-size: 2rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 12px;
+        }
+
+        .newsletter p {
+            color: #64748b;
+            margin-bottom: 32px;
+            font-size: 1rem;
+        }
+
+        .newsletter-form {
+            display: flex;
+            gap: 16px;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .newsletter-form input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.3s ease;
+            background: white;
+        }
+
+        .newsletter-form input:focus {
+            border-color: #667eea;
+        }
+
+        .newsletter-form button {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+
+        .newsletter-form button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        /* Footer */
+        .footer {
+            background: #2d3748;
+            color: white;
+            padding: 60px 0 24px;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-section h3 {
+            margin-bottom: 20px;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .footer-section p {
+            line-height: 1.6;
+            color: #a0aec0;
+            margin-bottom: 16px;
+            font-size: 0.95rem;
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section ul li {
+            margin-bottom: 12px;
+        }
+
+        .footer-section ul li a {
+            color: #a0aec0;
+            text-decoration: none;
+            transition: color 0.3s ease;
+            font-size: 0.95rem;
+        }
+
+        .footer-section ul li a:hover {
+            color: white;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .social-links a {
+            width: 40px;
+            height: 40px;
+            background: #4a5568;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+
+        .social-links a:hover {
+            background: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 24px;
+            border-top: 1px solid #4a5568;
+            color: #a0aec0;
+            font-size: 0.875rem;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 32px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: #a0aec0;
+            text-decoration: none;
+            transition: color 0.3s ease;
+            font-size: 0.875rem;
+        }
+
+        .footer-links a:hover {
+            color: white;
+        }
+
+        /* Advanced Animations */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .slide-in-left {
+            opacity: 0;
+            transform: translateX(-50px);
+            transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .slide-in-left.visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .slide-in-right {
+            opacity: 0;
+            transform: translateX(50px);
+            transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .slide-in-right.visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .scale-in {
+            opacity: 0;
+            transform: scale(0.8);
+            transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .scale-in.visible {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        /* Floating Animation */
+        @keyframes float {
+            0%, 100% { 
+                transform: translateY(0px); 
+            }
+            50% { 
+                transform: translateY(-10px); 
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% { 
+                transform: scale(1); 
+                box-shadow: 0 4px 20px rgba(102, 126, 234, 0.08);
+            }
+            50% { 
+                transform: scale(1.02); 
+                box-shadow: 0 8px 30px rgba(102, 126, 234, 0.15);
+            }
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: -1000px 0;
+            }
+            100% {
+                background-position: 1000px 0;
+            }
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-10px);
+            }
+            60% {
+                transform: translateY(-5px);
+            }
+        }
+
+        @keyframes rotate {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Enhanced Feature Cards */
+        .feature-card {
+            animation: pulse 4s ease-in-out infinite;
+            animation-delay: calc(var(--delay, 0) * 0.2s);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+            transform: rotate(45deg);
+            transition: all 0.8s ease;
+            opacity: 0;
+        }
+
+        .feature-card:hover::after {
+            animation: shimmer 1.5s ease-in-out;
+            opacity: 1;
+        }
+
+        .feature-card:nth-child(1) { --delay: 0; }
+        .feature-card:nth-child(2) { --delay: 1; }
+        .feature-card:nth-child(3) { --delay: 2; }
+        .feature-card:nth-child(4) { --delay: 3; }
+        .feature-card:nth-child(5) { --delay: 4; }
+        .feature-card:nth-child(6) { --delay: 5; }
+
+        /* Enhanced Icons */
+        .feature-icon {
+            animation: bounce 2s ease-in-out infinite;
+            animation-delay: calc(var(--delay, 0) * 0.3s);
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .feature-card:hover .feature-icon {
+            animation: none;
+            transform: scale(1.1) rotateY(360deg);
+        }
+
+        /* Testimonial Cards Enhanced */
+        .testimonial-card {
+            animation: float 6s ease-in-out infinite;
+            animation-delay: calc(var(--delay, 0) * 1s);
+        }
+
+        .testimonial-card:nth-child(1) { --delay: 0; }
+        .testimonial-card:nth-child(2) { --delay: 1; }
+        .testimonial-card:nth-child(3) { --delay: 2; }
+
+        .testimonial-card:hover {
+            animation: none;
+            transform: translateY(-15px) scale(1.02);
+        }
+
+        /* About Image Enhanced */
+        .image-container {
+            animation: float 8s ease-in-out infinite;
+            transition: all 0.6s ease;
+        }
+
+        .image-container::before {
+            animation: rotate 20s linear infinite;
+        }
+
+        .image-container:hover {
+            transform: scale(1.05);
+            animation: none;
+        }
+
+        .image-container i {
+            transition: all 0.6s ease;
+        }
+
+        .image-container:hover i {
+            transform: scale(1.2) rotateY(180deg);
+            color: #764ba2;
+        }
+
+        /* Newsletter Form Enhanced */
+        .newsletter-form input {
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .newsletter-form input:focus {
+            transform: scale(1.02);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .newsletter-form button {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .newsletter-form button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .newsletter-form button:hover::before {
+            left: 100%;
+        }
+
+        /* Social Links Enhanced */
+        .social-links a {
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .social-links a:hover {
+            transform: translateY(-5px) scale(1.1) rotateZ(10deg);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        /* Stagger Animation for Lists */
+        .footer-section ul li {
+            opacity: 0;
+            transform: translateX(-20px);
+            animation: slideInLeft 0.8s ease forwards;
+        }
+
+        .footer-section ul li:nth-child(1) { animation-delay: 0.1s; }
+        .footer-section ul li:nth-child(2) { animation-delay: 0.2s; }
+        .footer-section ul li:nth-child(3) { animation-delay: 0.3s; }
+        .footer-section ul li:nth-child(4) { animation-delay: 0.4s; }
+        .footer-section ul li:nth-child(5) { animation-delay: 0.5s; }
+
+        @keyframes slideInLeft {
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* Progressive Enhancement */
+        @media (prefers-reduced-motion: no-preference) {
+            .feature-card,
+            .testimonial-card,
+            .image-container {
+                transition: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 1rem;
+            }
+            
+            .section-title h2 {
+                font-size: 2rem;
+            }
+            
+            .features-grid {
+                grid-template-columns: 1fr;
+                gap: 24px;
+            }
+            
+            .about-content {
+                grid-template-columns: 1fr;
+                gap: 60px;
+            }
+            
+            .about-text h2 {
+                font-size: 2rem;
+            }
+            
+            .testimonials-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .newsletter-form {
+                flex-direction: column;
+                max-width: 100%;
+            }
+            
+            .footer-links {
+                flex-direction: column;
+                gap: 16px;
+            }
+            
+            .image-container {
+                width: 300px;
+                height: 300px;
+            }
+            
+            .about-features {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+        }
+
+        /* Global layout helpers for consistency */
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* Constrain wide sections for better alignment */
+        .stats {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            border-radius: 16px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="#" class="logo">
+            <span class="logo-text">DEPI</span>
+        </a>
+        
+        <div class="nav-right">
+            <ul class="nav-center">
+                <li class="nav-item">
+                    <a href="#" class="nav-link">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#features" class="nav-link" data-target="features">Features</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#about" class="nav-link" data-target="about">About</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#testimonials" class="nav-link" data-target="testimonials">Testimonials</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#footer" class="nav-link" data-target="footer">Contact</a>
+                </li>
+            </ul>
+            <div class="dropdown" id="loginDropdown">
+                <button class="login-btn" onclick="toggleDropdown()">
+                    Login <span class="dropdown-arrow">▼</span>
+                </button>
+                <div class="dropdown-menu">
+                    <a href="{{url_for('log_min')}}" class="dropdown-item">Login as a Ministry</a>
+                    <a href="{{url_for('log_comp')}}" class="dropdown-item">Login as a Company</a>
+                    <a href="{{url_for('log_inst')}}" class="dropdown-item">Login as an Instructor</a>
+                    <a href="{{url_for('log_coor')}}" class="dropdown-item">Login as a Coordinator</a>
+                    <a href="{{url_for('std_log')}}" class="dropdown-item">Login as a Student</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <div class="hero-content">
+            <p class="welcome-text">Welcome DEPI</p>
+            <h1 class="hero-title">
+                Welcome to the Digital Egypt Pioneers Platform <br>
+                Where Learning meets innovation<br>
+                <span class="accent">Building the Future.</span>
+            </h1>
+            <button class="btn-primary" onclick="document.getElementById('stats').scrollIntoView({ behavior: 'smooth' });">Start now</button>
+        </div>
+        <div class="hero-image">
+            <div class="robot-illustration">
+                 <img src="{{ url_for('static', filename='Art.png')}}" alt="Robot Illustration">
+            </div>
+        </div>
+    </section>
+
+<!-- Stats Section -->
+  <section id="stats" class="stats">
+    <div class="card">
+       <i class="fa-solid fa-graduation-cap"></i>
+      <div class="number" data-target="50000">0</div>
+      <div class="label">Students</div>
+    </div>
+    <div class="card">
+      <i class="fa-solid fa-person-chalkboard"></i>
+      <div class="number" data-target="1200">0</div>
+      <div class="label">Instructors</div>
+    </div>
+    <div class="card">
+      <i class="fa-solid fa-building"></i>
+      <div class="number" data-target="100">0</div>
+      <div class="label">Companies</div>
+    </div>
+    <div class="card">
+      <i class="fa-solid fa-laptop-code"></i>
+      <div class="number" data-target="100">0</div>
+      <div class="label">tracks</div>
+    </div>
+  </section>
+
+ <!-- Features Section -->
+    <section class="features" id="features">
+        <div class="container">
+            <div class="section-title">
+                <h2>Why Choose DEPI Platform?</h2>
+                <p>Discover innovative features designed to enhance your learning experience with cutting-edge technology and expert guidance</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card scale-in">
+                    <div class="feature-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <h3>AI-Powered Learning</h3>
+                    <p>Experience personalized learning paths powered by artificial intelligence that adapts to your unique learning style and pace for optimal results.</p>
+                </div>
+                <div class="feature-card scale-in">
+                    <div class="feature-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3>Expert Community</h3>
+                    <p>Join a vibrant community of learners and industry experts. Collaborate on projects, share knowledge, and grow together in your professional journey.</p>
+                </div>
+                <div class="feature-card scale-in">
+                    <div class="feature-icon">
+                        <i class="fas fa-certificate"></i>
+                    </div>
+                    <h3>Industry Certifications</h3>
+                    <p>Earn recognized certifications from leading tech companies that significantly boost your career prospects and validate your professional skills.</p>
+                </div>
+                <div class="feature-card scale-in">
+                    <div class="feature-icon">
+                        <i class="fas fa-laptop-code"></i>
+                    </div>
+                    <h3>Hands-On Projects</h3>
+                    <p>Work on real-world projects that apply theoretical knowledge practically, helping you build a comprehensive and impressive professional portfolio.</p>
+                </div>
+                <div class="feature-card scale-in">
+                    <div class="feature-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <h3>Flexible Learning</h3>
+                    <p>Learn at your own pace with 24/7 access to high-quality content and resources designed to fit seamlessly into your busy lifestyle.</p>
+                </div>
+                <div class="feature-card scale-in">
+                    <div class="feature-icon">
+                        <i class="fas fa-headset"></i>
+                    </div>
+                    <h3>Premium Support</h3>
+                    <p>Get dedicated support from industry experts and experienced mentors who guide you throughout your entire learning and career development journey.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="about" id="about">
+        <div class="container">
+            <div class="about-content">
+                <div class="about-text slide-in-left">
+                    <h2>About DEPI Platform</h2>
+                    <p>Digital Egypt Pioneers Initiative (DEPI) represents Egypt's premier educational technology platform, where innovative learning methodologies meet cutting-edge digital transformation.</p>
+                    <p>Our mission is to empower the next generation of digital leaders through comprehensive, industry-aligned training programs that bridge the gap between academic knowledge and real-world professional requirements.</p>
+                    <div class="about-features">
+                        <div class="about-feature">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Expert Instructors</span>
+                        </div>
+                        <div class="about-feature">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Industry Partnerships</span>
+                        </div>
+                        <div class="about-feature">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Career Support</span>
+                        </div>
+                        <div class="about-feature">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Modern Curriculum</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="about-image slide-in-right">
+                    <div class="image-container">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="testimonials" id="testimonials">
+        <div class="container">
+            <div class="section-title">
+                <h2>What Our Students Say</h2>
+                <p>Hear from our successful graduates and current learners about their transformative experiences with DEPI Platform</p>
+            </div>
+            <div class="testimonials-grid">
+                <div class="testimonial-card fade-in">
+                    <div class="testimonial-quote">
+                        "DEPI completely transformed my career trajectory. The comprehensive curriculum and hands-on projects gave me the practical skills I needed to excel in the tech industry. The mentorship was invaluable."
+                    </div>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">AM</div>
+                        <div class="author-info">
+                            <h4>Ahmed Mohamed</h4>
+                            <span>Software Engineer at Microsoft</span>
+                        </div>
+                    </div>
+                    <div class="rating">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                </div>
+                <div class="testimonial-card fade-in">
+                    <div class="testimonial-quote">
+                        "The AI-powered learning system is incredible. It personalized my learning experience perfectly, helping me master complex concepts faster than I ever thought possible. Highly recommended!"
+                    </div>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">SF</div>
+                        <div class="author-info">
+                            <h4>Sara Farouk</h4>
+                            <span>Data Scientist at Google</span>
+                        </div>
+                    </div>
+                    <div class="rating">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                </div>
+                <div class="testimonial-card fade-in">
+                    <div class="testimonial-quote">
+                        "The collaborative learning environment and expert community support made all the difference. I gained not just technical skills but also invaluable professional networks and friendships."
+                    </div>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">MH</div>
+                        <div class="author-info">
+                            <h4>Mohamed Hassan</h4>
+                            <span>UX Designer at Adobe</span>
+                        </div>
+                    </div>
+                    <div class="rating">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Newsletter Section -->
+    <section class="newsletter" id="newsletter">
+        <div class="container">
+            <div class="newsletter-content">
+                <h2>Stay Connected</h2>
+                <p>Subscribe to our newsletter for the latest updates on new courses, industry insights, and exclusive learning opportunities.</p>
+                <form class="newsletter-form">
+                    <input type="email" placeholder="Enter your email address" required>
+                    <button type="submit">Subscribe</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer" id="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>DEPI Platform</h3>
+                    <p>Empowering Egypt's digital transformation through innovative education, cutting-edge technology training, and comprehensive career development programs.</p>
+                    <div class="social-links">
+                        <a href="#" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" title="Twitter"><i class="fab fa-twitter"></i></a>
+                        <a href="#" title="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="#" title="Instagram"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">Courses</a></li>
+                        <li><a href="#">Instructors</a></li>
+                        <li><a href="#">Success Stories</a></li>
+                        <li><a href="#">Career Services</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Support</h3>
+                    <ul>
+                        <li><a href="#">Help Center</a></li>
+                        <li><a href="#">Contact Us</a></li>
+                        <li><a href="#">FAQs</a></li>
+                        <li><a href="#">Student Portal</a></li>
+                        <li><a href="#">Technical Support</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Contact Info</h3>
+                    <ul>
+                        <li><a href="#">Cairo, Egypt</a></li>
+                        <li><a href="#">+20 123 456 7890</a></li>
+                        <li><a href="#">info@depi.gov.eg</a></li>
+                        <li><a href="#">support@depi.gov.eg</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <div class="footer-links">
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms of Service</a>
+                    <a href="#">Cookie Policy</a>
+                    <a href="#">Accessibility</a>
+                </div>
+                <p>&copy; 2024 Digital Egypt Pioneers Initiative (DEPI). All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+  function toggleDropdown() {
+    const dropdown = document.getElementById('loginDropdown');
+    dropdown.classList.toggle('active');
+  }
+
+  // Close dropdown when clicking outside
+  document.addEventListener('click', function(event) {
+    const dropdown = document.getElementById('loginDropdown');
+    const isClickInsideDropdown = dropdown.contains(event.target);
+    
+    if (!isClickInsideDropdown) {
+      dropdown.classList.remove('active');
+    }
+  });
+
+  // Ripple effect for buttons
+  document.addEventListener('DOMContentLoaded', function() {
+    const buttons = document.querySelectorAll('.login-btn, .btn-primary, .btn-secondary');
+    
+    buttons.forEach(button => {
+      button.addEventListener('click', function(e) {
+        const ripple = document.createElement('span');
+        const rect = this.getBoundingClientRect();
+        const size = Math.max(rect.width, rect.height);
+        const x = e.clientX - rect.left - size / 2;
+        const y = e.clientY - rect.top - size / 2;
+        
+        ripple.style.cssText = `
+          position: absolute;
+          border-radius: 50%;
+          background: rgba(255, 255, 255, 0.6);
+          transform: scale(0);
+          animation: ripple 0.6s linear;
+          left: ${x}px;
+          top: ${y}px;
+          width: ${size}px;
+          height: ${size}px;
+          pointer-events: none;
+        `;
+        
+        this.style.position = 'relative';
+        this.style.overflow = 'hidden';
+        this.appendChild(ripple);
+        
+        setTimeout(() => {
+          if (ripple.parentNode) {
+            ripple.remove();
+          }
+        }, 600);
+      });
+    });
+
+    // Add CSS for ripple animation
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes ripple {
+        to {
+          transform: scale(4);
+          opacity: 0;
+        }
+      }
+    `;
+    document.head.appendChild(style);
+
+    // Navbar links smooth scroll to sections
+    const sectionLinks = document.querySelectorAll('.nav-link[data-target]');
+    sectionLinks.forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const id = link.getAttribute('data-target');
+        const target = document.getElementById(id);
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    });
+  });
+
+  // Animated counters (auto loop)
+  function animateCounters() {
+    const counters = document.querySelectorAll(".number");
+
+    counters.forEach(counter => {
+      let count = 0;
+      const target = +counter.getAttribute("data-target");
+
+      setInterval(() => {
+        count++;
+        if (count > target) count = 0; // إعادة من الأول
+        counter.innerText = count;
+      }, 30); // سرعة العد
+    });
+  }
+
+  // Start counters immediately
+  animateCounters();
+// Enhanced Scroll Animation with Stagger Effect
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry, index) => {
+                if (entry.isIntersecting) {
+                    // Add staggered delay for elements in the same container
+                    const delay = index * 100;
+                    setTimeout(() => {
+                        entry.target.classList.add('visible');
+                        
+                        // Add special effects for feature cards
+                        if (entry.target.classList.contains('feature-card')) {
+                            entry.target.style.animationDelay = `${index * 0.1}s`;
+                        }
+                    }, delay);
+                }
+            });
+        }, observerOptions);
+
+        // Observe all animated elements
+        document.querySelectorAll('.fade-in, .scale-in, .slide-in-left, .slide-in-right').forEach((el, index) => {
+            observer.observe(el);
+        });
+
+        // Smooth Scroll for Better UX
+        document.documentElement.style.scrollBehavior = 'smooth';
+
+        // Enhanced Newsletter Form with Animation Feedback
+        document.querySelector('.newsletter-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const button = e.target.querySelector('button');
+            const input = e.target.querySelector('input[type="email"]');
+            
+            // Button loading state
+            const originalText = button.textContent;
+            button.textContent = 'Subscribing...';
+            button.style.transform = 'scale(0.95)';
+            
+            setTimeout(() => {
+                button.textContent = '✓ Subscribed!';
+                button.style.background = 'linear-gradient(135deg, #10B981, #059669)';
+                input.style.transform = 'scale(1.02)';
+                input.style.borderColor = '#10B981';
+                
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.style.background = '';
+                    button.style.transform = '';
+                    input.style.transform = '';
+                    input.style.borderColor = '';
+                    e.target.reset();
+                }, 2000);
+            }, 1500);
+        });
+
+        // Parallax effect for background elements
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            const rate = scrolled * -0.5;
+            
+            // Apply parallax to decorative elements
+            const decorativeElements = document.querySelectorAll('.image-container::before');
+            decorativeElements.forEach(el => {
+                el.style.transform = `translate3d(0, ${rate}px, 0)`;
+            });
+        });
+
+        // Add hover sound effect (optional)
+        document.querySelectorAll('.feature-card, .testimonial-card').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                // Subtle vibration for mobile devices
+                if (navigator.vibrate) {
+                    navigator.vibrate(50);
+                }
+            });
+        });
+
+        // Progressive loading for better performance
+        const lazyLoadElements = () => {
+            const elements = document.querySelectorAll('.feature-card, .testimonial-card');
+            elements.forEach((el, index) => {
+                setTimeout(() => {
+                    el.style.opacity = '1';
+                    el.style.transform = 'translateY(0)';
+                }, index * 50);
+            });
+        };
+
+        // Initialize lazy loading after page load
+        window.addEventListener('load', lazyLoadElements);
+
+    </script>
+</body>
+</html>
