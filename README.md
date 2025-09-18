@@ -61,7 +61,7 @@ Each user has their own *email and password* to log in to the system. Based on t
 ## Getting Started
 1. Clone the repository:
    
-https://github.com/mohamed-kamal-eng/DEPI-system-main  ```bash
+-https://github.com/mohamed-kamal-eng/DEPI-system-main  ```bash
 
 
 https://github.com/mohamed-kamal-eng/DEPI-system-main
